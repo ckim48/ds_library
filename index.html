@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Home
+{% endblock %}
+
+{% block main %}
+    <!-- The sidebar -->
+    <div class="sidebar">
+        <a class="active" href="/"><h3><strong>My Books</strong></h3></a>
+        <a href="/currentlyreading">Currently Reading</a>
+        <a href="/wanttoread">Want To Read</a>
+        <a href="/read">Read</a>
+    </div>
+
+    <!-- The content -->
+    <main class="container">
+        <div class="content">
+            <h3>Hello, {{ name }}</h3>
+            <!-- Added a fun aspect of highlighting the table's cells when hovering over them! -->
+            <table class="text-center table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th class="text-start">Cover</th>
+                        <th class="text-start">Title</th>
+                        <th class="text-start">Author</th>
+                        <th class="text-start">isbn</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for book in books %}
+                        <tr>
+                            <form action="/" method="post">
+                                <td class="text-start">
+                                    <img class="cover" src="{{ book['cover'] }}" alt="Example cover">
+                                </td>
+                                <td class="text-start"><p class="table-data">{{ book['title'] }}</p></td>
+                                <td class="text-start"><p class="table-data">{{ book['authors'] }}</p></td>
+                                <td class="text-start"><p class="table-data">{{ book['isbn'] }}</p></td>
+                                <td>
+                                    <button type="submit" class="table-data btn btn-outline-primary" action="direct" value="{{ book['isbn'] }}" name="details">Details</button>
+                                </td>
+                            </form>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+{% endblock %}

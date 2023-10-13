@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Home
+{% endblock %}
+
+{% block main %}
+    <main class="container">
+        <table class="text-center table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th class="text-start">Cover</th>
+                    <th class="text-start">Title</th>
+                    <th class="text-start">Author</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for book in books %}
+                    <tr>
+                        <form action="/" method="post">
+                            <td class="text-start">
+                                <img class="cover" src="{{ book['cover'] }}" alt="Example cover">
+                            </td>
+                            <td class="text-start"><p class="table-data">{{ book['title'] }}</p></td>
+                            <td class="text-start"><p class="table-data">{{ book['authors'] }}</p></td>
+                            <td>
+                                <button type="submit" class="table-data btn btn-outline-primary" action="direct" value="{{ book['isbn'] }}" name="details">Details</button>
+                            </td>
+
+                            <td><p><a href="mailto:{{ emails[loop.index - 1]['user_email'] }}">Request to Borrow</a></p></td>
+                        </form>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </main>
+{% endblock %}

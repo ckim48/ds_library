@@ -1,0 +1,197 @@
+/* Size for brand */
+nav .navbar-brand
+{
+    font-size: xx-large;
+    font-family: "Garamond", "Georgia", "Times New Roman", serif;
+}
+
+/* Colors for brand */
+nav .navbar-brand .blue
+{
+    color: #537fbe;
+}
+nav .navbar-brand .red
+{
+    color: #993333;
+}
+nav .navbar-brand .yellow
+{
+    color: #f5b82e;
+}
+nav .navbar-brand .green
+{
+    color: #2e944b;
+}
+
+/* Beige color for header and body inspired by Goodreads */
+body {
+    background-color: rgba(244,241,234,0.5);
+    margin: 0;
+    font-family: "Garamond", "Georgia", "Times New Roman", serif;
+    font-size: 14px;
+    color: #191970;
+}
+
+.table-data {
+    color: #191970;
+}
+
+/* Equal sizing of book covers for aesthetics */
+.cover {
+    width: 56px;
+    margin: 0;
+    float: none;
+}
+
+/* Beige color for header and body inspired by Goodreads */
+.siteHeader {
+    background-color: rgba(244,241,234, 1);
+    top: 0px;
+    width: 100%;
+    z-index: 70;
+}
+
+/* SEARCH BAR */
+
+/* Style the input container */
+.topnav .search-container {
+    margin-left: 90px;
+    text-align: center;
+    width: 65%;
+}
+
+/* Style the input field inside the navbar */
+.topnav input[type=text] {
+    width: 90.5%;
+    padding: 6px;
+    margin-top: 8px;
+    font-size: 17px;
+    border: none;
+}
+
+/* Style the button inside the input container */
+.topnav .search-container button {
+    width: 4%;
+    padding: 6px;
+    margin-top: 8px;
+    margin-right: 30px;
+    background: #ddd;
+    font-size: 17px;
+    border: none;
+    cursor: pointer;
+}
+
+/* Make the button go dark when hovered over */
+.topnav .search-container button:hover {
+    background: #ccc;
+}
+
+/* Add responsiveness - On small screens, display the navbar vertically instead of horizontally */
+@media screen and (max-width: 600px) {
+  .topnav .search-container {
+    float: none;
+  }
+  .topnav a, .topnav input[type=text], .topnav .search-container button {
+    float: none;
+    display: block;
+    text-align: left;
+    width: 100%;
+    margin: 0;
+    padding: 14px;
+  }
+  .topnav input[type=text] {
+    border: 1px solid #ccc;
+  }
+}
+
+/* The sticky class is added to the navbar with JS when it reaches its scroll position */
+.sticky {
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
+
+/* Add some top padding to the page content to prevent sudden quick movement (as the navigation bar gets a new position at the top of the page (position:fixed and top:0) */
+.sticky + .full-content {
+  padding-top: 60px;
+}
+
+  /* Adds spacing around paragraphs for an easier read */
+.para-spacing
+{
+    margin-left: 20px;
+    margin-top: 25px;
+    margin-bottom: 20px
+}
+
+.center
+{
+  text-align: center;
+}
+
+h5 {
+  text-align: left;
+}
+
+/* The side navigation menu */
+.sidebar {
+  margin: 0;
+  padding: 0;
+  width: 200px;
+  background-color: rgba(244,241,234,0.5);
+  position: fixed;
+  height: 90%;
+  overflow: auto;
+}
+
+/* Style sidebar links */
+.sidebar a {
+  padding: 6px 8px 6px 16px;
+  text-decoration: none;
+  font-size: 20px;
+  color: #191970;
+  display: block;
+}
+
+/* Active/current link */
+.sidebar a.active {
+  background-color: #dfbf9f;
+  color: #191970;
+}
+
+/* Links on mouse-over */
+.sidebar a:hover:not(.active) {
+  background-color: #dfbf9f;
+  color: #191970;
+}
+
+/* Page content. The value of the margin-left property should match the value of the sidebar's width property */
+div.content {
+  margin-left: 200px;
+  padding: 1px 16px;
+  height: 1000px;
+}
+
+/* On screens that are less than 700px wide, make the sidebar into a topbar */
+@media screen and (max-width: 700px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+  }
+  .sidebar a {float: left;}
+  div.content {margin-left: 0;}
+}
+
+/* On screens that are less than 400px, display the bar vertically, instead of horizontally */
+@media screen and (max-width: 400px) {
+  .sidebar a {
+    text-align: center;
+    float: none;
+  }
+}
+
+/* Solid border */
+hr.solid {
+  border-top: 3px solid #bbb;
+}

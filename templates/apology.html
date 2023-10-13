@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Apology
+{% endblock %}
+
+{% block main %}
+    <!-- https://memegen.link/ -->
+    <div class="center">
+        <img alt="{{ top }}" class="border img-fluid" src="http://memegen.link/custom/{{ top | urlencode }}/{{ bottom | urlencode }}.jpg?alt=https://www.nicepng.com/png/detail/373-3733913_have-you-ever-wondered-why-your-dog-deems.png&width=400" title="{{ top }}">
+    </div>
+{% endblock %}
