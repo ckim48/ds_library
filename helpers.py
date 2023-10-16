@@ -62,7 +62,7 @@ def lookup(isbn):
                 book_info["cover"] = volumes["items"][0]["volumeInfo"]["imageLinks"]["thumbnail"]
             else:
                 book_info["cover"] = None  # No cover image available
-            return (book_info["title"], book_info["authors"], book_info["cover"], book_info["description"])
+            return book_info
         else:
             return None
     except (KeyError, TypeError, ValueError) as e:

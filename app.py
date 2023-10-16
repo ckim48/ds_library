@@ -156,8 +156,8 @@ def search():
 
     # Check if lookup was successful/isbn exists
     if volumes is not None:
-        title, authors, cover, description = volumes  # Unpack the tuple
-        return render_template("info.html", title=title, authors=authors, cover=cover, description=description,
+        # title, authors, cover, description = volumes  # Unpack the tuple
+        return render_template("info.html", title=volumes["title"], authors=volumes["authors"], cover=volumes["cover"], description=volumes["description"],
                                isbn=isbn)
     else:
         return apology("isbn does not exist", 400)
