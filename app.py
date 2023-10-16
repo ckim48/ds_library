@@ -155,11 +155,17 @@ def search():
     volumes = lookup(isbn)
 
     # Check if lookup was successful/isbn exists
-    if volumes == None:
+    if volumes is not None:
+        title, authors, cover, description = volumes  # Unpack the tuple
+        return render_template("info.html", title=title, authors=authors, cover=cover, description=description,
+                               isbn=isbn)
+    else:
         return apology("isbn does not exist", 400)
-
-    # If successful, display book info
-    return render_template("info.html", title=volumes["title"], authors=volumes["authors"], cover=volumes["cover"], description=volumes["description"], isbn=isbn)
+    # if volumes == None:
+    #     return apology("isbn does not exist", 400)
+    #
+    # # If successful, display book info
+    # return render_template("info.html", title=volumes["title"], authors=volumes["authors"], cover=volumes["cover"], description=volumes["description"], isbn=isbn)
 
 
 @app.route("/info")
