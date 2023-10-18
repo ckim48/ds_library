@@ -47,21 +47,23 @@
 <script>
     // JavaScript to handle the rating functionality
     const ratingContainers = document.querySelectorAll('.rating');
-
+    var bookIsbn ="";
+    var rating = 5;
     ratingContainers.forEach(container => {
         const stars = container.querySelectorAll('.star');
 
         stars.forEach(star => {
             star.addEventListener('click', () => {
-                const rating = star.getAttribute('data-rating');
-                const bookIsbn = container.getAttribute('data-book-isbn');
-                updateStarRating(container, rating);
+                rating = star.getAttribute('data-rating');
+                bookIsbn = container.getAttribute('data-book-isbn');
+                updateStarRating(container, rating,bookIsbn);
                 alert(`You rated the book with ISBN ${bookIsbn} ${rating} stars.`);
             });
         });
     });
 
-function updateStarRating(container, rating) {
+
+function updateStarRating(container, rating,bookIsbn) {
     const stars = container.querySelectorAll('.star');
     stars.forEach(star => {
         const starRating = star.getAttribute('data-rating');
@@ -77,8 +79,10 @@ function updateStarRating(container, rating) {
     const xhr = new XMLHttpRequest();
     xhr.open('POST', '/rate_book', true);
     xhr.setRequestHeader('Content-Type', 'application/json');
-    const starCount = starRating.length;
-    xhr.send(JSON.stringify({ isbn, username, starCount }));
+    const user_id = "{{ session['user_id'] }}";
+    var isbn = bookIsbn
+    var username = user_id
+    xhr.send(JSON.stringify({ isbn,  username, rating }));
 }
 </script>
 {% endblock %}

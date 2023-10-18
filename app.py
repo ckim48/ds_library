@@ -1,7 +1,7 @@
 import os
 
 from cs50 import SQL
-from flask import Flask, flash, redirect, render_template, request, session
+from flask import Flask, flash, redirect, render_template, request, session, jsonify
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -333,15 +333,30 @@ def library():
             # If successful, display book info
             return render_template("info.html", title=volumes["title"], authors=volumes["authors"], cover=volumes["cover"], description=volumes["description"], isbn=isbn)
 
-
-if __name__ == '__main__':
-    app.run(debug=True)
 @app.route('/rate_book', methods=['POST'])
 def rate_book():
     data = request.get_json()
     isbn = data.get('isbn')
-    username = data.get('username')
+    userid = data.get('username')
     rating = data.get('rating')
+
+    # Check if a record with the given ISBN and username already exists
+    existing_record =db.execute("SELECT * FROM rating WHERE isbn = ? AND username = ?", isbn, userid)
+    
+
+    if existing_record:
+        # Update the rating for the existing record
+        db.execute("UPDATE rating SET rating = ? WHERE isbn = ? AND username = ?", rating, isbn, userid)
+        return jsonify({'message': 'Rating updated'})
+    else:
+        # Add a new record with ISBN, username, and rating
+        db.execute("INSERT INTO rating (isbn, username, rating) VALUES (?, ?, ?)", isbn, userid, rating)
+        return jsonify({'message': 'New rating added'})
+if __name__ == '__main__':
+    app.run(debug=True)
+
+
+
 
 """ Added tables in SQL:
 
