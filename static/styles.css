@@ -209,5 +209,7 @@ hr.solid {
 .filled {
         color: gold !important; /* Change this to any color you want for the filled stars */
     }
-
+.review-title{
+text-align:left;
+}
 
