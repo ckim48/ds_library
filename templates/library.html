@@ -12,6 +12,7 @@
                     <th class="text-start">Cover</th>
                     <th class="text-start">Title</th>
                     <th class="text-start">Author</th>
+                    <th class="text-start">Rating</th>  <!-- New column for rating -->
                 </tr>
             </thead>
             <tbody>
@@ -24,9 +25,17 @@
                             <td class="text-start"><p class="table-data">{{ book['title'] }}</p></td>
                             <td class="text-start"><p class="table-data">{{ book['authors'] }}</p></td>
                             <td>
+                                <div class="rating" data-book-isbn="{{ book['isbn'] }}">
+                                    <span class="star" data-rating="1"><i class="fa-regular fa-star"></i></span>
+                                    <span class="star" data-rating="2"><i class="fa-regular fa-star"></i></span>
+                                    <span class="star" data-rating="3"><i class="fa-regular fa-star"></i></span>
+                                    <span class="star" data-rating="4"><i class="fa-regular fa-star"></i></span>
+                                    <span class="star" data-rating="5"><i class="fa-regular fa-star"></i></span>
+                                </div>
+                            </td>
+                            <td>
                                 <button type="submit" class="table-data btn btn-outline-primary" action="direct" value="{{ book['isbn'] }}" name="details">Details</button>
                             </td>
-
                             <td><p><a href="mailto:{{ emails[loop.index - 1]['user_email'] }}">Request to Borrow</a></p></td>
                         </form>
                     </tr>
@@ -34,4 +43,42 @@
             </tbody>
         </table>
     </main>
+
+<script>
+    // JavaScript to handle the rating functionality
+    const ratingContainers = document.querySelectorAll('.rating');
+
+    ratingContainers.forEach(container => {
+        const stars = container.querySelectorAll('.star');
+
+        stars.forEach(star => {
+            star.addEventListener('click', () => {
+                const rating = star.getAttribute('data-rating');
+                const bookIsbn = container.getAttribute('data-book-isbn');
+                updateStarRating(container, rating);
+                alert(`You rated the book with ISBN ${bookIsbn} ${rating} stars.`);
+            });
+        });
+    });
+
+function updateStarRating(container, rating) {
+    const stars = container.querySelectorAll('.star');
+    stars.forEach(star => {
+        const starRating = star.getAttribute('data-rating');
+        if (starRating <= rating) {
+            // Change the icon to a filled star
+            star.innerHTML = '<i class="fa-solid fa-star filled"></i>';
+        } else {
+            // Revert to the empty star icon
+            star.innerHTML = '<i class="fa-regular fa-star"></i>';
+        }
+    });
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/rate_book', true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    const starCount = starRating.length;
+    xhr.send(JSON.stringify({ isbn, username, starCount }));
+}
+</script>
 {% endblock %}

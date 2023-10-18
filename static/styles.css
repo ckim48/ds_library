@@ -33,6 +33,7 @@ body {
 }
 
 .table-data {
+    font-size:13px;
     color: #191970;
 }
 
@@ -195,3 +196,18 @@ div.content {
 hr.solid {
   border-top: 3px solid #bbb;
 }
+
+
+/* CSS for the rating stars */
+.rating .star i {
+    font-size: 1.2em;
+    cursor: pointer;
+    color: black; /* Default color for unfilled stars */
+}
+
+
+.filled {
+        color: gold !important; /* Change this to any color you want for the filled stars */
+    }
+
+

@@ -333,8 +333,15 @@ def library():
             # If successful, display book info
             return render_template("info.html", title=volumes["title"], authors=volumes["authors"], cover=volumes["cover"], description=volumes["description"], isbn=isbn)
 
+
 if __name__ == '__main__':
     app.run(debug=True)
+@app.route('/rate_book', methods=['POST'])
+def rate_book():
+    data = request.get_json()
+    isbn = data.get('isbn')
+    username = data.get('username')
+    rating = data.get('rating')
 
 """ Added tables in SQL:
 
