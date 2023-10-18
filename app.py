@@ -6,7 +6,7 @@ from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from helpers import apology, login_required, lookup, strOfAuthors
-
+import csv
 app = Flask(__name__)
 
 # Ensure templates are auto-reloaded
@@ -19,6 +19,12 @@ Session(app)
 
 # Configure CS50 Library to use SQLite database
 db = SQL("sqlite:///lionbooks.db")
+
+# with open('mock_data.csv', 'r') as file:
+#     csv_reader = csv.reader(file)
+#     next(csv_reader)  # Skip header row if needed
+#     for row in csv_reader:
+#         db.execute('INSERT INTO rating (username, isbn, rating) VALUES (?, ?, ?)', int(row[0]), row[1], int(row[2]))
 
 # # Make sure API key is set
 # if not os.environ.get("API_KEY"):
