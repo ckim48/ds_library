@@ -42,9 +42,61 @@
                 <button type="submit" class="btn btn-primary" name="remove" id="remove" value="{{ isbn }}">Remove from My Books</button>
             </form>
         </div>
+        <div class="container">
+            <h2 class="review-title mt-4">Book Review</h2>
+                        <!-- Display existing comments -->
+            <div id="comments">
+                <h4 class="review-title mt-4">User Comments:</h4>
+                <ul id="comment-list">
+                    {% for comment in comments %}
+                        <li>{{ comment }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Form to add a new comment -->
+            <form id="commentForm" onsubmit="submitComment(event)">
+                <input type="hidden" name="isbn" value="{{ isbn }}">
+                <h4>Add a Comment:</h4>
+                <textarea name="new_comment" class="form-control" rows="4" placeholder="Write your comment here"></textarea>
+                <button type="submit" class="btn btn-primary mt-2">Submit Comment</button>
+            </form>
+        </div>
         <script>
             document.querySelector('#add').onclick = function() {
                 alert("Added to My Books")
             }
+
+
         </script>
+
+<script>
+    function submitComment(event) {
+        event.preventDefault();  // Prevent default form submission behavior
+
+        // Get the form data (comment)
+        const comment = document.querySelector('textarea[name="new_comment"]').value;
+        const isbn = '{{ isbn }}';  // Get the ISBN from the template
+
+        // Send the comment data to the server using AJAX
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/submit_comment', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                // Comment submitted successfully, update the comments section
+<!--                const commentList = document.getElementById('comment-list');-->
+<!--                const newCommentItem = document.createElement('li');-->
+<!--                newCommentItem.textContent = comment;-->
+<!--                commentList.appendChild(newCommentItem);-->
+                document.querySelector('textarea[name="new_comment"]').value = '';  // Clear the comment input
+            } else {
+                console.error('Error submitting comment');
+            }
+        };
+        xhr.send(`isbn=${isbn}&new_comment=${encodeURIComponent(comment)}`);
+    }
+</script>
+
+
 {% endblock %}
