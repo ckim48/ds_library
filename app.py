@@ -1,7 +1,7 @@
 import os
 
 from cs50 import SQL
-from flask import Flask, flash, redirect, render_template, request, session, jsonify
+from flask import Flask, flash, redirect, render_template, request, session, jsonify,url_for
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -52,9 +52,10 @@ def index():
             # Lookup book info
             isbn = request.form.get("details")
             volumes = lookup(isbn)
+            comments = db.execute("SELECT user_id, comment FROM comments WHERE isbn = ?", isbn)
 
             # If successful, display book info
-            return render_template("info.html", title=volumes["title"], authors=volumes["authors"], cover=volumes["cover"], description=volumes["description"], isbn=isbn)
+            return render_template("info.html", title=volumes["title"], authors=volumes["authors"], cover=volumes["cover"], description=volumes["description"], isbn=isbn,comments=comments)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -176,7 +177,7 @@ def search():
 
 @app.route("/info")
 @login_required
-def info():
+def info(isbn="",shelf=None):
     """Handle a book from its info page"""
 
     # Obtain user email to later store in library
@@ -258,9 +259,10 @@ def currentlyreading():
             # Lookup book info
             isbn = request.form.get("details")
             volumes = lookup(isbn)
+            comments = db.execute("SELECT user_id, comment FROM comments WHERE isbn = ?", isbn)
 
             # Display book info
-            return render_template("info.html", title=volumes["title"], authors=volumes["authors"], cover=volumes["cover"], description=volumes["description"], isbn=isbn)
+            return render_template("info.html", title=volumes["title"], authors=volumes["authors"], cover=volumes["cover"], description=volumes["description"], isbn=isbn,comments=comments)
 
 
 @app.route("/wanttoread")
@@ -283,9 +285,10 @@ def wanttoread():
             # Lookup book info
             isbn = request.form.get("details")
             volumes = lookup(isbn)
+            comments = db.execute("SELECT user_id, comment FROM comments WHERE isbn = ?", isbn)
 
             # Display book info
-            return render_template("info.html", title=volumes["title"], authors=volumes["authors"], cover=volumes["cover"], description=volumes["description"], isbn=isbn)
+            return render_template("info.html", title=volumes["title"], authors=volumes["authors"], cover=volumes["cover"], description=volumes["description"], isbn=isbn,comments=comments)
 
 
 @app.route("/read")
@@ -308,9 +311,10 @@ def read():
             # Lookup book info
             isbn = request.form.get("details")
             volumes = lookup(isbn)
+            comments = db.execute("SELECT user_id, comment FROM comments WHERE isbn = ?", isbn)
 
             # Display book info
-            return render_template("info.html", title=volumes["title"], authors=volumes["authors"], cover=volumes["cover"], description=volumes["description"], isbn=isbn)
+            return render_template("info.html", title=volumes["title"], authors=volumes["authors"], cover=volumes["cover"], description=volumes["description"], isbn=isbn,comment=comments)
 
 
 @app.route("/library")
@@ -348,9 +352,10 @@ def library():
             # Lookup book info
             isbn = request.form.get("details")
             volumes = lookup(isbn)
+            comments = db.execute("SELECT user_id, comment FROM comments WHERE isbn = ?", isbn)
 
             # If successful, display book info
-            return render_template("info.html", title=volumes["title"], authors=volumes["authors"], cover=volumes["cover"], description=volumes["description"], isbn=isbn)
+            return render_template("info.html", title=volumes["title"], authors=volumes["authors"], cover=volumes["cover"], description=volumes["description"], isbn=isbn,comments=comments)
 
 @app.route('/rate_book', methods=['POST'])
 def rate_book():
@@ -371,6 +376,30 @@ def rate_book():
         # Add a new record with ISBN, username, and rating
         db.execute("INSERT INTO rating (isbn, username, rating) VALUES (?, ?, ?)", isbn, userid, rating)
         return jsonify({'message': 'New rating added'})
+
+@app.route('/submit_comment', methods=['POST'])
+def submit_comment():
+    try:
+        book_isbn = request.form.get('isbn')  # Assuming you pass the ISBN in the form
+        user_id = session.get("user_id")
+        comment = request.form.get('new_comment')
+
+        # Insert the comment into the database
+        db.execute("INSERT INTO comments (user_id, isbn, comment) VALUES (?, ?, ?)", user_id, book_isbn, comment)
+
+        response_data = {
+            "success": True,
+            "message": "Comment submitted successfully"
+        }
+    except Exception as e:
+        response_data = {
+            "success": False,
+            "message": str(e)
+        }
+
+    return jsonify(response_data)
+
+
 if __name__ == '__main__':
     app.run(debug=True)
 

@@ -212,4 +212,12 @@ hr.solid {
 .review-title{
 text-align:left;
 }
+    #comments {
+        margin-top: 20px;
+    }
+
+    .comment-list {
+        list-style: none;
+        padding: 0;
+    }
 

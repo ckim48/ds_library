@@ -55,38 +55,48 @@
             </div>
 
             <!-- Form to add a new comment -->
-            <form id="comment-form">
-                <h4 class="review-title mt-4 mb-4">Add a Comment:</h4>
-                <textarea id="new-comment" class="form-control" rows="4" placeholder="Write your comment here"></textarea>
-                <button type="submit" class="btn btn-primary mt-4">Submit Comment</button>
+            <form id="commentForm" onsubmit="submitComment(event)">
+                <input type="hidden" name="isbn" value="{{ isbn }}">
+                <h4>Add a Comment:</h4>
+                <textarea name="new_comment" class="form-control" rows="4" placeholder="Write your comment here"></textarea>
+                <button type="submit" class="btn btn-primary mt-2">Submit Comment</button>
             </form>
         </div>
         <script>
             document.querySelector('#add').onclick = function() {
                 alert("Added to My Books")
             }
+
+
         </script>
 
-            <script>
-        document.querySelector('#add').onclick = function() {
-            alert("Added to My Books")
-        }
+<script>
+    function submitComment(event) {
+        event.preventDefault();  // Prevent default form submission behavior
 
-        // Handle comment submission
-        document.getElementById('comment-form').addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent the form from submitting normally
+        // Get the form data (comment)
+        const comment = document.querySelector('textarea[name="new_comment"]').value;
+        const isbn = '{{ isbn }}';  // Get the ISBN from the template
 
-            // Get the new comment from the textarea
-            const newComment = document.getElementById('new-comment').value;
+        // Send the comment data to the server using AJAX
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/submit_comment', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                // Comment submitted successfully, update the comments section
+<!--                const commentList = document.getElementById('comment-list');-->
+<!--                const newCommentItem = document.createElement('li');-->
+<!--                newCommentItem.textContent = comment;-->
+<!--                commentList.appendChild(newCommentItem);-->
+                document.querySelector('textarea[name="new_comment"]').value = '';  // Clear the comment input
+            } else {
+                console.error('Error submitting comment');
+            }
+        };
+        xhr.send(`isbn=${isbn}&new_comment=${encodeURIComponent(comment)}`);
+    }
+</script>
 
-            // Append the new comment to the comment list
-            const commentList = document.getElementById('comment-list');
-            const commentItem = document.createElement('li');
-            commentItem.textContent = newComment;
-            commentList.appendChild(commentItem);
 
-            // Clear the textarea after submission
-            document.getElementById('new-comment').value = '';
-        });
-    </script>
 {% endblock %}
