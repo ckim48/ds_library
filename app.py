@@ -331,90 +331,110 @@ def read():
 
 @app.route("/library")
 def library():
-    """Display library page"""
-    # Log-in not required for those only interested in borrowing books
+	"""Display library page"""
+	# Log-in not required for those only interested in borrowing books
 
-    # If request via GET, display library
-    if request.method == "GET":
-        # Create a dictionary to store book ratings by ISBN
-        book_ratings = {}
-        recommend_isbns = get_recommendations()
-        recommend_books = list()
-        emails = list()
+	# If request via GET, display library
+	if request.method == "GET":
+		# Create a dictionary to store book ratings by ISBN
+		book_ratings = {}
+		recommend_isbns = get_recommendations()
+		recommend_books = list()
+		emails = list()
 
-        for isbn in recommend_isbns:
-            book = db.execute("SELECT DISTINCT isbn, title, authors, cover FROM library WHERE isbn=?", isbn)
-            print(isbn, book)
-            email = db.execute("SELECT user_email FROM library WHERE isbn=?", isbn)
-            rating = db.execute("SELECT rating FROM rating WHERE isbn = ? AND username = ?", isbn, session["user_id"])
-            if rating:
-                book_ratings[isbn] = int(rating[0]["rating"])
-            else:
-                # If no rating exists, set it to 0
-                book_ratings[isbn] = 0
+		for isbn in recommend_isbns:
+			book = db.execute("SELECT DISTINCT isbn, title, authors, cover FROM library WHERE isbn=?", isbn)
+			print(isbn, book)
+			email = db.execute("SELECT user_email FROM library WHERE isbn=?", isbn)
+			rating = db.execute("SELECT rating FROM rating WHERE isbn = ? AND username = ?", isbn, session["user_id"])
+			if rating:
+				book_ratings[isbn] = int(rating[0]["rating"])
+			else:
+				# If no rating exists, set it to 0
+				book_ratings[isbn] = 0
 
-            recommend_books.append(book[0])
-            emails.append(email[0])
+			recommend_books.append(book[0])
+			emails.append(email[0])
 
-        # # Fetch and store the rating for each book
-        # for book in myBooks:
-        #     isbn = book['isbn']
-        #     # Fetch the rating for the book
-        #     rating = db.execute("SELECT rating FROM rating WHERE isbn = ? AND username = ?", isbn, session["user_id"])
-        #     # If a rating exists, store it in the dictionary
-        #     if rating:
-        #         book_ratings[isbn] = int(rating[0]["rating"])
-        #     else:
-        #         # If no rating exists, set it to 0
-        #         book_ratings[isbn] = 0
-        #
-        # # Obtain emails to allow users to contact the book owners
-        # emails = db.execute("SELECT user_email FROM library")
+		# # Fetch and store the rating for each book
+		# for book in myBooks:
+		#     isbn = book['isbn']
+		#     # Fetch the rating for the book
+		#     rating = db.execute("SELECT rating FROM rating WHERE isbn = ? AND username = ?", isbn, session["user_id"])
+		#     # If a rating exists, store it in the dictionary
+		#     if rating:
+		#         book_ratings[isbn] = int(rating[0]["rating"])
+		#     else:
+		#         # If no rating exists, set it to 0
+		#         book_ratings[isbn] = 0
+		#
+		# # Obtain emails to allow users to contact the book owners
+		# emails = db.execute("SELECT user_email FROM library")
+		# Create a dictionary to store book ratings by ISBN
+		book_ratings2 = {}
+		book_sentiments = {}
+		recommend_sentiments = sentiment_all_books()
+		recommend_books_sentiments = list()
+		emails2 = list()
 
-        return render_template("library.html", books=recommend_books, emails=emails,book_ratings = book_ratings)
+		for isbn in sorted(recommend_sentiments, key=lambda x: recommend_sentiments[x], reverse=True):
+			book = db.execute("SELECT DISTINCT isbn, title, authors, cover FROM library WHERE isbn=?", isbn)
+			print(isbn, book)
+			email2 = db.execute("SELECT user_email FROM library WHERE isbn=?", isbn)
+			rating = db.execute("SELECT rating FROM rating WHERE isbn = ? AND username = ?", isbn, session["user_id"])
+			book[0]["sentiment"] = recommend_sentiments[isbn]
+			if rating:
+				book_ratings2[isbn] = int(rating[0]["rating"])
+			else:
+				# If no rating exists, set it to 0
+				book_ratings2[isbn] = 0
 
-    else:
-        # If request via POST (user clicked on details button for a specific book)
-        if request.form.get("details"):
+			recommend_books_sentiments.append(book[0])
+			emails2.append(email2[0])
+		return render_template("library.html", books=recommend_books, emails=emails,book_ratings = book_ratings,books2=recommend_books_sentiments,emails2=emails2,book_sentiments=book_sentiments)
 
-            # Lookup book info
-            isbn = request.form.get("details")
-            volumes = lookup(isbn)
-            comments = db.execute("SELECT user_id, comment FROM comments WHERE isbn = ?", isbn)
+	else:
+		# If request via POST (user clicked on details button for a specific book)
+		if request.form.get("details"):
 
-            # If successful, display book info
-            return render_template("info.html", title=volumes["title"], authors=volumes["authors"], cover=volumes["cover"], description=volumes["description"], isbn=isbn,comments=comments)
+			# Lookup book info
+			isbn = request.form.get("details")
+			volumes = lookup(isbn)
+			comments = db.execute("SELECT user_id, comment FROM comments WHERE isbn = ?", isbn)
+
+			# If successful, display book info
+			return render_template("info.html", title=volumes["title"], authors=volumes["authors"], cover=volumes["cover"], description=volumes["description"], isbn=isbn)
 
 @app.route('/library')
 @login_required
 def get_recommendations():
-    # Get the user's ID
-    user_id = session.get("user_id")
+	# Get the user's ID
+	user_id = session.get("user_id")
 
-    # Fetch books rated highly by the user (e.g., ratings greater than 4)
-    high_rated_books = db.execute("SELECT DISTINCT isbn FROM rating WHERE username = ? AND rating > 4", user_id)
+	# Fetch books rated highly by the user (e.g., ratings greater than 4)
+	high_rated_books = db.execute("SELECT DISTINCT isbn FROM rating WHERE username = ? AND rating > 4", user_id)
 
-    # Extract the ISBNs of highly rated books into a list (Remove replicas)
-    highly_rated_isbns = [book['isbn'] for book in high_rated_books]
+	# Extract the ISBNs of highly rated books into a list (Remove replicas)
+	highly_rated_isbns = [book['isbn'] for book in high_rated_books]
 
-    recommendations = []
+	recommendations = []
 
-    for isbn in highly_rated_isbns:
-        # For each highly rated book, fetch other books that have similar ratings
-        similar_rated_books = db.execute("SELECT DISTINCT isbn FROM rating WHERE isbn != ? AND username "
-                                         "IN (SELECT username FROM rating WHERE isbn = ? AND rating > 4)", isbn, isbn)
+	for isbn in highly_rated_isbns:
+		# For each highly rated book, fetch other books that have similar ratings
+		similar_rated_books = db.execute("SELECT DISTINCT isbn FROM rating WHERE isbn != ? AND username "
+										 "IN (SELECT username FROM rating WHERE isbn = ? AND rating > 4)", isbn, isbn)
 
-        # Extract the ISBNs of similar rated books into a list
-        similar_rated_isbns = [book['isbn'] for book in similar_rated_books]
+		# Extract the ISBNs of similar rated books into a list
+		similar_rated_isbns = [book['isbn'] for book in similar_rated_books]
 
-        # Add the similar rated books to recommendations if not already rated by the user
-        for similar_isbn in similar_rated_isbns:
-            if similar_isbn not in highly_rated_isbns:
-                recommendations.append(similar_isbn)
+		# Add the similar rated books to recommendations if not already rated by the user
+		for similar_isbn in similar_rated_isbns:
+			if similar_isbn not in highly_rated_isbns:
+				recommendations.append(similar_isbn)
 
-    top_recommendations = list(set(recommendations))[:10]
+	top_recommendations = list(set(recommendations))[:10]
 
-    return top_recommendations
+	return top_recommendations
 
 @app.route('/rate_book', methods=['POST'])
 def rate_book():
@@ -465,19 +485,37 @@ def stats():
 
 def get_sentiment(isbn):
 	analyzer = SentimentIntensityAnalyzer()
-	comments = db.execute("SELECT comments FROM comments WHERE isbn = ?", (isbn,))
+	comments = db.execute("SELECT comment FROM comments WHERE isbn = ?", isbn)
+	print("ABC",comments)
 	total_sentiment = 0
 	total_comments = len(comments)
 	if not comments:
-		return "No Data"
+		return -1000  # when no comments
 	for comment in comments:
-		sentiment = analyzer.polarity_scores(comment[0])
+		sentiment = analyzer.polarity_scores(comment['comment'])
 		total_sentiment += sentiment["compound"]
 
 	average_sentiment = total_sentiment / total_comments
-	print(average_sentiment*100)
+	return round(average_sentiment * 100,1) # 100 에 가까울수록 positive, - 100에 가까울수록 negative, 0에 가까울수록 neutral
 
 
+def sentiment_all_books():
+	book_list = db.execute("SELECT DISTINCT isbn FROM library")
+	sentiments = {}
+
+	for book in book_list:
+		sentiment = get_sentiment(book["isbn"])
+		sentiments[book["isbn"]] = sentiment
+
+	# Sort the sentiments dictionary by values in descending order
+	sorted_sentiments = dict(sorted(sentiments.items(), key=lambda item: item[1], reverse=True))
+
+	print("----------------- Sentiments in Descending Order -----------------")
+	for isbn, sentiment in sorted_sentiments.items():
+		print(f"ISBN: {isbn}, Sentiment: {sentiment}")
+	print(sentiments)
+	return sentiments
+sentiment_all_books()
 @app.route('/get_read_books_by_month', methods=['POST'])
 def get_read_books_by_month():
 	user_id = session["user_id"]

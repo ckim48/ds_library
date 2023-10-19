@@ -5,7 +5,8 @@
 {% endblock %}
 
 {% block main %}
-    <main class="container">
+    <main >
+        <div class="container">
         <h1>Recommend #1</h1>
         <table class="text-center table table-striped table-hover">
             <thead>
@@ -44,6 +45,47 @@
                 {% endfor %}
             </tbody>
         </table>
+            </div>
+
+
+                <div class="container">
+        <h1>Recommend #2</h1>
+        <table class="text-center table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th class="text-start">Cover</th>
+                    <th class="text-start">Title</th>
+                    <th class="text-start">Author</th>
+                    <th class="text-start">Sentiment</th>  <!-- New column for rating -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for book in books2 %}
+                    <tr>
+                        <form action="/" method="post">
+                            <td class="text-start">
+                                <img class="cover" src="{{ book['cover'] }}" alt="Example cover">
+                            </td>
+                            <td class="text-start"><p class="table-data">{{ book['title'] }}</p></td>
+                            <td class="text-start"><p class="table-data">{{ book['authors'] }}</p></td>
+                            {% if  book['sentiment']  == -1000 %}
+                                <td class="text-start"><p class="table-data">No Data</p></td>
+
+                            {%else%}
+                                 <td class="text-start"><p class="table-data">{{ book['sentiment'] }} %</p></td>
+
+                            {% endif %}
+
+                            <td>
+                                <button type="submit" class="table-data btn btn-outline-primary" action="direct" value="{{ book['isbn'] }}" name="details">Details</button>
+                            </td>
+                            <td><p><a href="mailto:{{ emails2[loop.index - 1]['user_email'] }}">Request to Borrow</a></p></td>
+                        </form>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+            </div>
     </main>
 
 <script>
