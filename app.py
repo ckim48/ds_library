@@ -319,32 +319,47 @@ def read():
 
 @app.route("/library")
 def library():
-    get_recommendations()
     """Display library page"""
     # Log-in not required for those only interested in borrowing books
 
     # If request via GET, display library
     if request.method == "GET":
-        # Obtain book info
-        myBooks = db.execute("SELECT DISTINCT isbn, title, authors, cover FROM library")
         # Create a dictionary to store book ratings by ISBN
         book_ratings = {}
+        recommend_isbns = get_recommendations()
+        recommend_books = list()
+        emails = list()
 
-        # Fetch and store the rating for each book
-        for book in myBooks:
-            isbn = book['isbn']
-            # Fetch the rating for the book
-            rating = db.execute("SELECT rating FROM rating WHERE isbn = ? AND username = ?", isbn,session["user_id"])
-            # If a rating exists, store it in the dictionary
+        for isbn in recommend_isbns:
+            book = db.execute("SELECT DISTINCT isbn, title, authors, cover FROM library WHERE isbn=?", isbn)
+            print(isbn, book)
+            email = db.execute("SELECT user_email FROM library WHERE isbn=?", isbn)
+            rating = db.execute("SELECT rating FROM rating WHERE isbn = ? AND username = ?", isbn, session["user_id"])
             if rating:
                 book_ratings[isbn] = int(rating[0]["rating"])
             else:
                 # If no rating exists, set it to 0
                 book_ratings[isbn] = 0
-        # Obtain emails to allow users to contact the book owners
-        emails = db.execute("SELECT user_email FROM library")
 
-        return render_template("library.html", books=myBooks, emails=emails,book_ratings = book_ratings)
+            recommend_books.append(book[0])
+            emails.append(email[0])
+
+        # # Fetch and store the rating for each book
+        # for book in myBooks:
+        #     isbn = book['isbn']
+        #     # Fetch the rating for the book
+        #     rating = db.execute("SELECT rating FROM rating WHERE isbn = ? AND username = ?", isbn, session["user_id"])
+        #     # If a rating exists, store it in the dictionary
+        #     if rating:
+        #         book_ratings[isbn] = int(rating[0]["rating"])
+        #     else:
+        #         # If no rating exists, set it to 0
+        #         book_ratings[isbn] = 0
+        #
+        # # Obtain emails to allow users to contact the book owners
+        # emails = db.execute("SELECT user_email FROM library")
+
+        return render_template("library.html", books=recommend_books, emails=emails,book_ratings = book_ratings)
 
     else:
         # If request via POST (user clicked on details button for a specific book)
@@ -358,7 +373,7 @@ def library():
             # If successful, display book info
             return render_template("info.html", title=volumes["title"], authors=volumes["authors"], cover=volumes["cover"], description=volumes["description"], isbn=isbn,comments=comments)
 
-@app.route('/recommend')
+@app.route('/library')
 @login_required
 def get_recommendations():
     # Get the user's ID
@@ -385,18 +400,9 @@ def get_recommendations():
             if similar_isbn not in highly_rated_isbns:
                 recommendations.append(similar_isbn)
 
-    # Remove duplicate ISBNs from the recommendations
-    unique_recommendations = list(set(recommendations))
-    print(unique_recommendations)
+    top_recommendations = list(set(recommendations))[:10]
 
-    # Limit the number of recommendations, for example, top 5 recommendations
-    top_recommendations = unique_recommendations[:5]
-    print(top_recommendations)
-
-    # Fetch book details for the recommended ISBNs
-    recommended_books = [lookup(isbn) for isbn in top_recommendations]
-
-    # return render_template("recommendations.html", recommended_books=recommended_books)
+    return top_recommendations
 
 @app.route('/rate_book', methods=['POST'])
 def rate_book():
