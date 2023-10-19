@@ -247,7 +247,7 @@ def currentlyreading():
     # If request via GET, display user's books
     if request.method == "GET":
         # Obtain book info
-        myBooks = db.execute("SELECT library.isbn, title, authors, cover FROM library WHERE user_id = ? AND isbn IN (SELECT myBooks.isbn FROM myBooks WHERE shelf = ?)",
+        myBooks = db.execute("SELECT DISTINCT library.isbn, title, authors, cover FROM library WHERE user_id = ? AND isbn IN (SELECT myBooks.isbn FROM myBooks WHERE shelf = ?)",
                              session["user_id"], "currentlyReading")
 
         return render_template("currentlyreading.html", books=myBooks)
@@ -274,7 +274,7 @@ def wanttoread():
     if request.method == "GET":
         # Obtain book info
         myBooks = db.execute(
-            "SELECT library.isbn, title, authors, cover FROM library WHERE user_id = ? AND isbn IN (SELECT myBooks.isbn FROM myBooks WHERE shelf = ?)", session["user_id"], "wantToRead")
+            "SELECT DISTINCT library.isbn, title, authors, cover FROM library WHERE user_id = ? AND isbn IN (SELECT myBooks.isbn FROM myBooks WHERE shelf = ?)", session["user_id"], "wantToRead")
 
         return render_template("wanttoread.html", books=myBooks)
 
@@ -300,7 +300,7 @@ def read():
     if request.method == "GET":
         # Obtain book info
         myBooks = db.execute(
-            "SELECT library.isbn, title, authors, cover FROM library WHERE user_id = ? AND isbn IN (SELECT myBooks.isbn FROM myBooks WHERE shelf = ?)", session["user_id"], "read")
+            "SELECT DISTINCT library.isbn, title, authors, cover FROM library WHERE user_id = ? AND isbn IN (SELECT myBooks.isbn FROM myBooks WHERE shelf = ?)", session["user_id"], "read")
 
         return render_template("read.html", books=myBooks)
 
@@ -319,13 +319,14 @@ def read():
 
 @app.route("/library")
 def library():
+    get_recommendations()
     """Display library page"""
     # Log-in not required for those only interested in borrowing books
 
     # If request via GET, display library
     if request.method == "GET":
         # Obtain book info
-        myBooks = db.execute("SELECT isbn, title, authors, cover FROM library")
+        myBooks = db.execute("SELECT DISTINCT isbn, title, authors, cover FROM library")
         # Create a dictionary to store book ratings by ISBN
         book_ratings = {}
 
@@ -357,6 +358,46 @@ def library():
             # If successful, display book info
             return render_template("info.html", title=volumes["title"], authors=volumes["authors"], cover=volumes["cover"], description=volumes["description"], isbn=isbn,comments=comments)
 
+@app.route('/recommend')
+@login_required
+def get_recommendations():
+    # Get the user's ID
+    user_id = session.get("user_id")
+
+    # Fetch books rated highly by the user (e.g., ratings greater than 4)
+    high_rated_books = db.execute("SELECT DISTINCT isbn FROM rating WHERE username = ? AND rating > 4", user_id)
+
+    # Extract the ISBNs of highly rated books into a list (Remove replicas)
+    highly_rated_isbns = [book['isbn'] for book in high_rated_books]
+
+    recommendations = []
+
+    for isbn in highly_rated_isbns:
+        # For each highly rated book, fetch other books that have similar ratings
+        similar_rated_books = db.execute("SELECT DISTINCT isbn FROM rating WHERE isbn != ? AND username "
+                                         "IN (SELECT username FROM rating WHERE isbn = ? AND rating > 4)", isbn, isbn)
+
+        # Extract the ISBNs of similar rated books into a list
+        similar_rated_isbns = [book['isbn'] for book in similar_rated_books]
+
+        # Add the similar rated books to recommendations if not already rated by the user
+        for similar_isbn in similar_rated_isbns:
+            if similar_isbn not in highly_rated_isbns:
+                recommendations.append(similar_isbn)
+
+    # Remove duplicate ISBNs from the recommendations
+    unique_recommendations = list(set(recommendations))
+    print(unique_recommendations)
+
+    # Limit the number of recommendations, for example, top 5 recommendations
+    top_recommendations = unique_recommendations[:5]
+    print(top_recommendations)
+
+    # Fetch book details for the recommended ISBNs
+    recommended_books = [lookup(isbn) for isbn in top_recommendations]
+
+    # return render_template("recommendations.html", recommended_books=recommended_books)
+
 @app.route('/rate_book', methods=['POST'])
 def rate_book():
     data = request.get_json()
@@ -366,7 +407,6 @@ def rate_book():
 
     # Check if a record with the given ISBN and username already exists
     existing_record =db.execute("SELECT * FROM rating WHERE isbn = ? AND username = ?", isbn, userid)
-    
 
     if existing_record:
         # Update the rating for the existing record
