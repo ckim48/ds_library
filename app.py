@@ -206,7 +206,7 @@ def info(isbn="",shelf=None):
 	elif request.args.get("alrRead"):
 		isbn = request.args.get("alrRead")
 		shelf = "read"
-		current_year = datetime.now().strftime("%y")
+		current_year = int(datetime.now().strftime("%y"))+2000
 		current_month = datetime.now().strftime("%m")
 
 		db.execute("INSERT INTO read_books (user_id, isbn, month,year) VALUES (?, ?, ?, ?)",
