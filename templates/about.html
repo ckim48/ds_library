@@ -1,0 +1,138 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Home
+{% endblock %}
+
+{% block main %}
+    <main class="container">
+      <section id="team" class="team">
+          <div class="container">
+
+            <div class="section-title" data-aos="fade-up">
+              <h2>About Me</h2>
+<!--              <p>Magnam dolores commodi suscipit eius consequatur</p>-->
+            </div>
+
+            <div class="row">
+                <div class="col-lg-6 text-center" data-aos="fade-right">
+                    <img src="../static/person.jpg" class="img-fluid myphoto mx-auto" alt="">
+                </div>
+              <div class="col-lg-6" data-aos="fade-left">
+                    <div class="pt-4 pt-lg-0 pl-0 pl-lg-3 ">
+                  <h3>Scott Kim</h3>
+                  <p class="fst-italic">
+                    Hello, My name is Scott Kim. I am a student ~. I made this website for the following reasons:
+                  </p>
+                  <ul>
+                    <li><i class="bx bx-check-double"></i> Ullamco laboris nisi ut aliquip ex ea commodo consequat.</li>
+                    <li><i class="bx bx-check-double"></i> Duis aute irure dolor in reprehenderit in voluptate velit.</li>
+                    <li><i class="bx bx-check-double"></i> Ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate trideta storacalaperda mastiro dolore eu fugiat nulla pariatur.</li>
+                  </ul>
+                  <p>
+                    Ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
+                    velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+                    culpa qui officia deserunt mollit anim id est laborum
+                  </p>
+                  <a href="#contact">Contact</a>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <div class="container">
+
+            <div class="section-title" data-aos="fade-up">
+              <h2 class="mt-5">About LionBooks</h2>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 order-2 order-lg-1">
+                <div class="icon-box mt-5 mt-lg-0" data-aos="fade-up">
+                  <i class="bx bx-receipt"></i>
+                  <h4>LionBooks1</h4>
+                  <p>Consequuntur sunt aut quasi enim aliquam quae harum pariatur laboris nisi ut aliquip</p>
+                </div>
+                <div class="icon-box mt-5" data-aos="fade-up" data-aos-delay="100">
+                  <i class="bx bx-cube-alt"></i>
+                  <h4>Web Developments</h4>
+                  <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt</p>
+                </div>
+                <div class="icon-box mt-5" data-aos="fade-up" data-aos-delay="200">
+                  <i class="bx bx-images"></i>
+                  <h4>Aut occaecati</h4>
+                  <p>Aut suscipit aut cum nemo deleniti aut omnis. Doloribus ut maiores omnis facere</p>
+                </div>
+                </div>
+                 <div class="col-md-6 order-2 order-lg-1" data-aos="fade-left" data-aos-delay="200">
+                      <img src="../static/books.jpg" class="img-fluid myphoto2 mx-auto " alt="">
+
+                   </div>
+            </div>
+
+          </div>
+          <div class="section-title" data-aos="fade-up">
+              <h2 class="mt-5">Contact</h2>
+              <div class="row mt-5">
+                <div class="col-md-6 contact-info">
+                    <h3><i class="bi bi-envelope"></i> Email</h3>
+                  <p>sample@email.com</p>
+                </div>
+
+                <div class="col-md-6 contact-info">
+                    <h3><i class="bi bi-github"></i> Github</h3>
+                  <p>sample-id</p>
+                </div>
+
+              </div>
+            </div>
+        </section>
+    </main>
+
+<script>
+    // JavaScript to handle the rating functionality
+    const ratingContainers = document.querySelectorAll('.rating');
+    var bookIsbn ="";
+    var rating = 5;
+    ratingContainers.forEach(container => {
+        const stars = container.querySelectorAll('.star');
+
+        stars.forEach(star => {
+            star.addEventListener('click', () => {
+                rating = star.getAttribute('data-rating');
+                bookIsbn = container.getAttribute('data-book-isbn');
+                updateStarRating(container, rating,bookIsbn);
+                alert(`You rated the book with ISBN ${bookIsbn} ${rating} stars.`);
+            });
+        });
+    });
+
+
+function updateStarRating(container, rating,bookIsbn) {
+    const stars = container.querySelectorAll('.star');
+    stars.forEach(star => {
+        const starRating = star.getAttribute('data-rating');
+        if (starRating <= rating) {
+            // Change the icon to a filled star
+            star.innerHTML = '<i class="fa-solid fa-star filled"></i>';
+        } else {
+            // Revert to the empty star icon
+            star.innerHTML = '<i class="fa-regular fa-star"></i>';
+        }
+    });
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/rate_book', true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    const user_id = "{{ session['user_id'] }}";
+    var isbn = bookIsbn
+    var username = user_id
+    xhr.send(JSON.stringify({ isbn,  username, rating }));
+}
+
+</script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  AOS.init();
+</script>
+{% endblock %}

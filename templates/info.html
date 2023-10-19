@@ -45,11 +45,11 @@
         <div class="container">
             <h2 class="review-title mt-4">Book Review</h2>
                         <!-- Display existing comments -->
-            <div id="comments">
+            <div id="comments review-title">
                 <h4 class="review-title mt-4">User Comments:</h4>
-                <ul id="comment-list">
-                    {% for comment in comments %}
-                        <li>{{ comment }}</li>
+                <ul id="comment-list review-title" >
+                    {% for c in comments %}
+                        <li class="review-title"> <span><strong>{{ c["username"] }}</strong>: {{ c["comment"] }} </li>
                     {% endfor %}
                 </ul>
             </div>
@@ -57,7 +57,7 @@
             <!-- Form to add a new comment -->
             <form id="commentForm" onsubmit="submitComment(event)">
                 <input type="hidden" name="isbn" value="{{ isbn }}">
-                <h4>Add a Comment:</h4>
+                <h4 class="review-title">Add a Comment:</h4>
                 <textarea name="new_comment" class="form-control" rows="4" placeholder="Write your comment here"></textarea>
                 <button type="submit" class="btn btn-primary mt-2">Submit Comment</button>
             </form>

@@ -1,0 +1,145 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Home
+{% endblock %}
+
+{% block main %}
+    <main class="container">
+      <section id="team" class="team">
+          <div class="container">
+
+            <div class="section-title" data-aos="fade-up">
+              <h2>Your Statistics</h2>
+            </div>
+              <div class="row">
+                  <div class="col-md-6">
+                                                    <canvas id="readBooksChart2" width="400" height="200"></canvas>
+
+                  </div>
+                    <div class="col-md-6">
+                            <canvas id="readBooksChart" width="400" height="200"></canvas>
+                  </div>
+
+              </div>
+
+
+
+          </div>
+
+
+
+
+        </section>
+    </main>
+
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  AOS.init();
+</script>
+<script>
+    const chartData = {
+        labels: [],  // Array to hold the months
+        datasets: [{
+            label: 'Books Read',
+            data: [],  // Array to hold the number of books read for each month
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1,
+        }]
+    };
+
+    // Fetch data from the Flask route
+    fetch('/get_read_books_by_month', {
+        method: 'POST',
+        body: JSON.stringify({ username: "{{ session['user_id'] }}" })
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Ensure that the months are in the correct order (1 to 12)
+        const orderedMonthsData = Array.from({ length: 12 }, (_, i) => ({
+            month: i + 1,
+            count: data.booksRead[data.months.indexOf(i + 1)] || 0
+        }));
+
+        chartData.labels = orderedMonthsData.map(entry => entry.month);
+        chartData.datasets[0].data = orderedMonthsData.map(entry => entry.count);
+
+        const readBooksChart = new Chart(document.getElementById('readBooksChart').getContext('2d'), {
+            type: 'bar',
+            data: chartData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Months' // Add x-axis label
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Books Read' // Add y-axis label
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+<script>
+    const chartData2 = {
+        labels: [],  // Array to hold the years
+        datasets: [{
+            label: 'Books Read',
+            data: [],  // Array to hold the number of books read for each year
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1,
+        }]
+    };
+
+    // Fetch data from the Flask route for books read by year
+    fetch('/get_read_books_by_year', {
+        method: 'POST',
+        body: JSON.stringify({ username: "{{ session['user_id'] }}" })
+    })
+    .then(response => response.json())
+    .then(data => {
+        chartData2.labels = data.years;
+        chartData2.datasets[0].data = data.booksRead;
+
+        const readBooksChart = new Chart(document.getElementById('readBooksChart2').getContext('2d'), {
+            type: 'bar',
+            data: chartData2,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Years' // Add x-axis label
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Books Read' // Add y-axis label
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+
+{% endblock %}
