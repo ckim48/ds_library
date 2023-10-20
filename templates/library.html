@@ -69,10 +69,10 @@
                             <td class="text-start"><p class="table-data">{{ book['title'] }}</p></td>
                             <td class="text-start"><p class="table-data">{{ book['authors'] }}</p></td>
                             {% if  book['sentiment']  == -1000 %}
-                                <td class="text-start"><p class="table-data">No Data</p></td>
+                                <td class="text-start"><p class="table-data">0%</p></td>
 
                             {%else%}
-                                 <td class="text-start"><p class="table-data">{{ book['sentiment'] }} %</p></td>
+                                 <td class="text-start"><p class="table-data">{{ book['sentiment'] }}%</p></td>
 
                             {% endif %}
 
