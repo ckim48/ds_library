@@ -6,6 +6,7 @@ from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from datetime import datetime
+import random
 
 from helpers import apology, login_required, lookup, strOfAuthors
 import csv
@@ -42,7 +43,7 @@ def index():
     # If request via GET, display user's books
     if request.method == "GET":
         # Obtain information of each book user owns to display
-        myBooks = db.execute("SELECT isbn, title, authors, cover FROM library WHERE user_id = ?", session["user_id"])
+        myBooks = db.execute("SELECT DISTINCT isbn, title, authors, cover FROM library WHERE user_id = ?", session["user_id"])
 
         # Obtain user's name to say hello
         name = db.execute("SELECT name FROM users WHERE id = ?", session["user_id"])[0]['name']
@@ -322,12 +323,22 @@ def read():
 
     # If request via GET, display user's books
     if request.method == "GET":
+        book_ratings = {}
         # Obtain book info
         myBooks = db.execute(
-            "SELECT DISTINCT library.isbn, title, authors, cover FROM library WHERE user_id = ? AND isbn IN (SELECT myBooks.isbn FROM myBooks WHERE shelf = ?)",
+            "SELECT DISTINCT library.isbn, title, authors, cover FROM library WHERE isbn IN (SELECT myBooks.isbn FROM myBooks WHERE user_id = ? AND shelf = ?)",
             session["user_id"], "read")
-
-        return render_template("read.html", books=myBooks)
+        print(myBooks)
+        for book in myBooks:
+            isbn = book['isbn']
+            rating = db.execute("SELECT rating FROM rating WHERE isbn = ? AND username = ?", isbn, session["user_id"])
+            if rating:
+                if rating:
+                    book_ratings[isbn] = int(rating[0]["rating"])
+                else:
+                    # If no rating exists, set it to 0
+                    book_ratings[isbn] = 0
+        return render_template("read.html", books=myBooks, book_ratings=book_ratings)
 
     else:
         # If request via POST (user clicked on details button for a specific book)
@@ -414,40 +425,41 @@ def get_recommendations():
 
     user_id = session.get("user_id")
     rated_books = db.execute("SELECT DISTINCT isbn FROM rating WHERE username = ? ORDER BY rating DESC", user_id)
-    print(rated_books)
+    rated_isbns = [book['isbn'] for book in rated_books]
 
-    if rated_books:
-        rated_isbns = [book['isbn'] for book in rated_books]
+     # Fetch books rated highly by the user (e.g., ratings greater than 4)
+    high_rated_books = db.execute("SELECT DISTINCT isbn FROM rating WHERE username = ? AND rating >= 4", user_id)
 
-        # Fetch books rated highly by the user (e.g., ratings greater than 4)
-        high_rated_books = db.execute("SELECT DISTINCT isbn FROM rating WHERE username = ? AND rating >= 4", user_id)
+    # Extract the ISBNs of highly rated books into a list (Remove replicas)
+    highly_rated_isbns = [book['isbn'] for book in high_rated_books]
+    print("highly:", highly_rated_isbns)
 
-        # Extract the ISBNs of highly rated books into a list (Remove replicas)
-        highly_rated_isbns = [book['isbn'] for book in high_rated_books]
-        print(highly_rated_isbns)
-
-        recommendations = []
-
+    recommendations = []
+    if high_rated_books:
         for isbn in highly_rated_isbns:
             # For each highly rated book, fetch other books that have similar ratings
-            similar_rated_books = db.execute("SELECT DISTINCT isbn FROM rating WHERE isbn != ? AND username "
-                                             "IN (SELECT username FROM rating WHERE isbn = ? AND rating >= 4)", isbn,
-                                             isbn)
+            similar_rated_books = db.execute("SELECT DISTINCT isbn, username FROM rating WHERE isbn != ? AND rating >= 4 AND username "
+                                             "IN (SELECT username FROM rating WHERE isbn = ? AND rating >= 4 AND username != ?)", isbn,
+                                             isbn, user_id)
 
             # Extract the ISBNs of similar rated books into a list
+            similar_users = [book['username'] for book in similar_rated_books]
             similar_rated_isbns = [book['isbn'] for book in similar_rated_books]
+            print("similar:", similar_users, similar_rated_isbns)
 
             # Add the similar rated books to recommendations if not already rated by the user
             for similar_isbn in similar_rated_isbns:
-                if similar_isbn not in rated_isbns:
+                if (similar_isbn not in rated_isbns) and (similar_isbn not in recommendations):
                     recommendations.append(similar_isbn)
-
+            random.shuffle(recommendations)
         # Sort recommendations based on whether you've rated the book and then by the rating
         for isbn in rated_isbns:
             recommendations.append(isbn)
     else:
-        recommendations = all_books_isbn
-
+        recommendations = [item for item in all_books_isbn if item not in rated_isbns]
+        random.shuffle(recommendations)
+        
+    print("recommend:", recommendations)
     top_recommendations = list(recommendations)[:10]
     return top_recommendations
 
@@ -458,6 +470,8 @@ def rate_book():
     isbn = data.get('isbn')
     userid = data.get('username')
     rating = data.get('rating')
+    current_year = int(datetime.now().strftime("%y")) + 2000
+    current_month = datetime.now().strftime("%m")
 
     # Check if a record with the given ISBN and username already exists
     existing_record = db.execute("SELECT * FROM rating WHERE isbn = ? AND username = ?", isbn, userid)
@@ -469,6 +483,9 @@ def rate_book():
     else:
         # Add a new record with ISBN, username, and rating
         db.execute("INSERT INTO rating (isbn, username, rating) VALUES (?, ?, ?)", isbn, userid, rating)
+        db.execute("INSERT INTO read_books (user_id, isbn, month, year) VALUES (?, ?, ?, ?)",
+                    session["user_id"], isbn, current_month, current_year)
+        db.execute("INSERT INTO myBooks (user_id, isbn, shelf) VALUES (?, ?, ?)", userid, isbn, "read")
         return jsonify({'message': 'New rating added'})
 
 
