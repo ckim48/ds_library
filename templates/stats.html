@@ -111,8 +111,14 @@
     })
     .then(response => response.json())
     .then(data => {
-        chartData2.labels = data.years;
-        chartData2.datasets[0].data = data.booksRead;
+        const filteredYears = data.years.filter((year, index) => data.booksRead[index] > 0);
+        const filteredBooksRead = data.booksRead.filter(booksRead => booksRead > 0);
+
+        chartData2.labels = filteredYears;
+        chartData2.datasets[0].data = filteredBooksRead;
+
+        // chartData2.labels = data.years;
+        // chartData2.datasets[0].data = data.booksRead;
 
         const readBooksChart = new Chart(document.getElementById('readBooksChart2').getContext('2d'), {
             type: 'bar',
