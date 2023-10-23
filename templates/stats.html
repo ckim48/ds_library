@@ -10,19 +10,37 @@
           <div class="container">
 
             <div class="section-title" data-aos="fade-up">
-              <h2>Your Statistics</h2>
+              <h2>My Progression</h2>
             </div>
               <div class="row">
                   <div class="col-md-6">
-                                                    <canvas id="readBooksChart2" width="400" height="200"></canvas>
+                    <p class="text-center">Number of books read by year<p>
+                       <canvas id="readBooksChart2" width="400" height="200"></canvas>
 
                   </div>
                     <div class="col-md-6">
+                                            <p class="text-center">Number of books read by month<p>
+
                             <canvas id="readBooksChart" width="400" height="200"></canvas>
                   </div>
 
               </div>
 
+
+              <div class="row">
+                  <div class="col-md-6">
+                                        <p class="text-center mt-5 ">Sentiments of your reviews<p>
+
+                                                    <canvas class="mx-auto" id="reviewChart" width="300" height="100"></canvas>
+
+                  </div>
+                    <div class="col-md-6">
+                                                                <p class="text-center mt-5 ">Activity Logs<p>
+
+<canvas class="mx-auto" id="loginChart" width="400" height="200"></canvas>
+                  </div>
+
+              </div>
 
 
           </div>
@@ -145,6 +163,51 @@
             }
         });
     });
+
+const reviewData = {
+  positive: 25,
+  negative: 10,
+  neutral: 5,
+};
+
+    const ctx3 = document.getElementById("reviewChart").getContext("2d");
+
+const reviewChart = new Chart(ctx3, {
+  type: "pie",
+  data: {
+    labels: ["Positive", "Negative", "Neutral"],
+    datasets: [
+      {
+        data: [reviewData.positive, reviewData.negative, reviewData.neutral],
+        backgroundColor: ["#AAFE8E", "#FEA68E", "gray"], // You can specify the colors you prefer
+      },
+    ],
+  },
+});
+const loginData = {
+  labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+  data: [10, 12, 17, 22, 26, 30, 20, 25, 10, 25, 17, 35],
+};
+
+const ctx4 = document.getElementById("loginChart").getContext("2d");
+
+const loginChart = new Chart(ctx4, {
+  type: "line",
+  data: {
+    labels: loginData.labels,
+    datasets: [
+      {
+        label: "Number of Logins",
+        data: loginData.data,
+        borderColor: "#56B4ED",
+        fill: false,
+      },
+    ],
+  },
+  options: {
+    responsive: true,
+  },
+});
 </script>
 
 

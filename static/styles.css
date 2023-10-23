@@ -2,7 +2,7 @@
 nav .navbar-brand
 {
     font-size: xx-large;
-    font-family: "Garamond", "Georgia", "Times New Roman", serif;
+    font-family: 'Poppins', sans-serif, "Garamond", "Georgia", "Times New Roman", serif;
 }
 
 /* Colors for brand */
@@ -27,19 +27,16 @@ nav .navbar-brand .green
 body {
     background-color: rgba(244,241,234,0.5);
     margin: 0;
-    font-family: "Garamond", "Georgia", "Times New Roman", serif;
+    font-family:  'Poppins', sans-serif, "Garamond", "Georgia", "Times New Roman", serif;
     font-size: 14px;
     color: #191970;
 }
 
-.table-data {
-    font-size:13px;
-    color: #191970;
-}
+
 
 /* Equal sizing of book covers for aesthetics */
 .cover {
-    width: 56px;
+    width: 100px;
     margin: 0;
     float: none;
 }
@@ -58,7 +55,7 @@ body {
 .topnav .search-container {
     margin-left: 90px;
     text-align: center;
-    width: 65%;
+    width: 55%;
 }
 
 /* Style the input field inside the navbar */
@@ -150,20 +147,19 @@ h5 {
   padding: 6px 8px 6px 16px;
   text-decoration: none;
   font-size: 20px;
-  color: #191970;
+  color: black;
   display: block;
 }
 
 /* Active/current link */
 .sidebar a.active {
-  background-color: #dfbf9f;
-  color: #191970;
+/*  background-color: #dfbf9f;*/
+  color: #993333;
 }
 
 /* Links on mouse-over */
 .sidebar a:hover:not(.active) {
-  background-color: #dfbf9f;
-  color: #191970;
+  color: #993333;
 }
 
 /* Page content. The value of the margin-left property should match the value of the sidebar's width property */
@@ -292,3 +288,65 @@ a:hover {
 .myphoto{
 width:50%;
 }
+
+.bigfont{
+  font-size: 17px;
+}
+.mytable{
+  background-color: #F9F0EE;
+}
+
+.table-data {
+    font-size:15px;
+    color: black;
+}
+.thead-dark{
+  background-color: #993333;
+  color: white;
+}
+
+        /* Custom CSS for striped rows */
+        .mytable tbody tr:nth-child(odd) {
+            background-color: #FFEFEC; /* Set your desired background color */
+        }
+
+        .mytable tbody tr:nth-child(even) {
+            background-color: #FCF6F4; /* Set your desired background color for even rows */
+        }
+
+        .mytable tbody tr:hover {
+            background-color:#FEE0D8; /* Background color on hover */
+            transition: background-color 0.3s; /* Transition duration */
+            scale: 1.03;
+        }
+
+                .mytable thead th {
+            border-bottom: 2px solid #FF8C6D; /* Set your desired border color */
+        }
+
+        .btn-outline-primary{
+          border: 1px solid #993333;
+        }
+                .btn-outline-primary:hover{
+          border: 1px solid #993333;
+          background-color: #993333;
+
+        }
+
+        .mytable tbody tr td {
+            border-right: 1px solid white; /* Set your desired vertical line color and width */
+        }
+.mywidth{
+  width: 12%;
+}
+#reviewChart {
+  width: 320px !important;
+  height: 320px !important;
+}
+/*#loginChart{
+   width: 340px !important;
+  height: 300px !important; 
+}*/
+table{
+  border-radius: 5px;
+} 
