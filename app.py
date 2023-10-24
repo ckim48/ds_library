@@ -24,6 +24,7 @@ Session(app)
 # Configure CS50 Library to use SQLite database
 db = SQL("sqlite:///lionbooks.db")
 
+sentiment_nums = {}
 
 # with open('mock_data.csv', 'r') as file:
 #     csv_reader = csv.reader(file)
@@ -476,6 +477,7 @@ def oldread():
                                    comment=comments)
 @app.route("/library")
 def library():
+    global sentiment_nums
     """Display library page"""
     # Log-in not required for those only interested in borrowing books
 
@@ -506,7 +508,9 @@ def library():
         recommend_sentiments = sentiment_all_books()
         recommend_books_sentiments = list()
         emails2 = list()
-
+        positive = 0
+        neutral = 0
+        negative =0
         for isbn in sorted(recommend_sentiments, key=lambda x: recommend_sentiments[x], reverse=True):
             book = db.execute("SELECT DISTINCT isbn, title, authors, cover FROM library WHERE isbn=?", isbn)
             email2 = db.execute("SELECT user_email FROM library WHERE isbn=?", isbn)
@@ -518,8 +522,18 @@ def library():
                 # If no rating exists, set it to 0
                 book_ratings2[isbn] = 0
 
+            if book_ratings2[isbn] > 0.3:
+                positive +=1
+            elif book_ratings2[isbn] > -0.4:
+                neutral +=1
+            else:
+                negative +=1
             recommend_books_sentiments.append(book[0])
             emails2.append(email2[0])
+        sentiment_nums["positive"] = positive
+        sentiment_nums["neutral"] = neutral
+        sentiment_nums["negative"]= negative
+
         return render_template("library.html", books=recommend_books, emails=emails, book_ratings=book_ratings,
                                books2=recommend_books_sentiments, emails2=emails2, book_sentiments=book_sentiments)
 
@@ -699,7 +713,7 @@ def about():
 
 @app.route('/stats', methods=['GET'])
 def stats():
-    return render_template('stats.html')
+    return render_template('stats.html',sentiment_nums=sentiment_nums)
 
 
 def get_sentiment(isbn):
