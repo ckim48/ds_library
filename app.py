@@ -35,7 +35,37 @@ db = SQL("sqlite:///lionbooks.db")
 # if not os.environ.get("API_KEY"):
 #     raise RuntimeError("API_KEY not set")
 
+@app.route("/old", methods=["GET", "POST"])
+@login_required
+def index_old():
+    """Show all of user's books"""
+    # If request via GET, display user's books
+    if request.method == "GET":
+        # Obtain information of each book user owns to display
+        myBooks = db.execute("SELECT DISTINCT isbn, title, authors, cover FROM library WHERE user_id = ?", session["user_id"])
 
+        # Obtain user's name to say hello
+        name = db.execute("SELECT name FROM users WHERE id = ?", session["user_id"])[0]['name']
+
+        return render_template("index_old.html", books=myBooks, name=name)
+
+    else:
+        # If request via POST (user clicked on "details" button in each row)
+        if request.form.get("details"):
+            # Lookup book info
+            isbn = request.form.get("details")
+            volumes = lookup(isbn)
+            query = """
+			SELECT u.username, c.comment
+			FROM users u
+			JOIN comments c ON u.id = c.user_id
+			WHERE c.isbn = ?
+			"""
+            comments = db.execute(query, isbn)
+            # If successful, display book info
+            return render_template("info_old.html", title=volumes["title"], authors=volumes["authors"],
+                                   cover=volumes["cover"], description=volumes["description"], isbn=isbn,
+                                   comments=comments)
 @app.route("/", methods=["GET", "POST"])
 @login_required
 def index():

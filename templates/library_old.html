@@ -7,31 +7,26 @@
 {% block main %}
     <main >
         <div class="container">
-        <h1>What You Might Like <span data-toggle="tooltip" data-placement="top" title="The Books are recommended by a contents-based recommender system with the users' ratings">
-  <i class="far fa-question-circle"></i>
-</span></h1>
-        <table class="text-center table  mytable mt-5">
-            <thead class="thead-dark">
+        <h1>Recommend by Your Preference</h1>
+        <table class="text-center table table-striped table-hover">
+            <thead>
                 <tr>
-                    <th class="text-start text-center bigfont">Cover</th>
-                    <th class="text-start text-center bigfont">Title</th>
-                    <th class="text-start text-center bigfont">Author</th>
-                    <th class="text-start text-center bigfont mywidth">My Rating</th>  
-                    <th class="text-start text-center bigfont">Info</th>  
-                    <th class="text-start text-center bigfont">Request</th>  
-
+                    <th class="text-start">Cover</th>
+                    <th class="text-start">Title</th>
+                    <th class="text-start">Author</th>
+                    <th class="text-start">My Rating</th>  <!-- New column for rating -->
                 </tr>
             </thead>
             <tbody>
                 {% for book in books %}
                     <tr>
                         <form action="/" method="post">
-                            <td class="text-start text-center align-middle">
+                            <td class="text-start">
                                 <img class="cover" src="{{ book['cover'] }}" alt="Example cover">
                             </td>
-                            <td class="text-start text-center align-middle"><p class="table-data">{{ book['title'] }}</p></td>
-                            <td class="text-start text-center align-middle"><p class="table-data">{{ book['authors'] }}</p></td>
-                            <td class="text-start text-center align-middle">
+                            <td class="text-start"><p class="table-data">{{ book['title'] }}</p></td>
+                            <td class="text-start"><p class="table-data">{{ book['authors'] }}</p></td>
+                            <td>
                                 {% set star_rating = book_ratings[book["isbn"]] | default(0) %}
                                 <div class="rating" data-book-isbn="{{ book['isbn'] }}">
                                   {% for i in range(1, 6) %}
@@ -41,10 +36,10 @@
                                   {% endfor %}
                                 </div>
                             </td>
-                            <td class="text-start text-center align-middle">
+                            <td>
                                 <button type="submit" class="table-data btn btn-outline-primary" action="direct" value="{{ book['isbn'] }}" name="details">Details</button>
                             </td>
-                            <td class="text-start text-center align-middle"><p><a href="mailto:{{ emails[loop.index - 1]['user_email'] }}">Request to Borrow</a></p></td>
+                            <td><p><a href="mailto:{{ emails[loop.index - 1]['user_email'] }}">Request to Borrow</a></p></td>
                         </form>
                     </tr>
                 {% endfor %}
@@ -54,43 +49,37 @@
 
 
                 <div class="container">
-        <h1 class="mt-5 mb-4">Recommendations By Sentiment Analysis<span data-toggle="tooltip" data-placement="top" title="The Books are recommended by a sentiment score which is achieved by analyzing the users' reviews ">
-  <i class="far fa-question-circle"></i>
-</span></h1>
-        <table class="text-center table mytable mt-5">
-            <thead class="thead-dark">
+        <h1 class="mt-5 mb-4">Recommend by Sentiments of Users' Reviews</h1>
+        <table class="text-center table table-striped table-hover">
+            <thead>
                 <tr>
-                    <th class="text-start text-center bigfont">Cover</th>
-                    <th class="text-start text-center bigfont">Title</th>
-                    <th class="text-start text-center bigfont">Author</th>
-                    <th class="text-start text-center bigfont">Sentiment</th>
-                                                            <th class="text-start text-center bigfont">Info</th>  
-
-                                        <th class="text-start text-center bigfont">Request</th>  
-
+                    <th class="text-start">Cover</th>
+                    <th class="text-start">Title</th>
+                    <th class="text-start">Author</th>
+                    <th class="text-start">Sentiment</th>  <!-- New column for rating -->
                 </tr>
             </thead>
             <tbody>
                 {% for book in books2 %}
                     <tr>
                         <form action="/" method="post">
-                            <td class="text-start text-center align-middle">
+                            <td class="text-start">
                                 <img class="cover" src="{{ book['cover'] }}" alt="Example cover">
                             </td>
-                            <td class="text-start text-center align-middle"><p class="table-data">{{ book['title'] }}</p></td>
-                            <td class="text-start text-center align-middle"><p class="table-data">{{ book['authors'] }}</p></td>
+                            <td class="text-start"><p class="table-data">{{ book['title'] }}</p></td>
+                            <td class="text-start"><p class="table-data">{{ book['authors'] }}</p></td>
                             {% if  book['sentiment']  == -1000 %}
-                                <td class="text-start text-center align-middle"><p class="table-data">0%</p></td>
+                                <td class="text-start"><p class="table-data">0%</p></td>
 
                             {%else%}
-                                 <td class="text-start text-center align-middle"><p class="table-data">{{ book['sentiment'] }}%</p></td>
+                                 <td class="text-start"><p class="table-data">{{ book['sentiment'] }}%</p></td>
 
                             {% endif %}
 
-                            <td class="text-start text-center align-middle">
+                            <td>
                                 <button type="submit" class="table-data btn btn-outline-primary" action="direct" value="{{ book['isbn'] }}" name="details">Details</button>
                             </td>
-                            <td class="text-start text-center align-middle"> <p><a href="mailto:{{ emails2[loop.index - 1]['user_email'] }}">Request to Borrow</a></p></td>
+                            <td><p><a href="mailto:{{ emails2[loop.index - 1]['user_email'] }}">Request to Borrow</a></p></td>
                         </form>
                     </tr>
                 {% endfor %}
@@ -98,7 +87,6 @@
         </table>
             </div>
     </main>
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 
 <script>
     // JavaScript to handle the rating functionality
@@ -140,10 +128,5 @@ function updateStarRating(container, rating,bookIsbn) {
     var username = user_id
     xhr.send(JSON.stringify({ isbn,  username, rating }));
 }
-</script>
-<script>
-  $(document).ready(function() {
-    $('[data-toggle="tooltip"]').tooltip();
-  });
 </script>
 {% endblock %}

@@ -1,0 +1,103 @@
+{% extends "layout.html" %}
+
+{% block link %}
+<!-- Add icon library -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+{% endblock %}
+
+{% block title %}
+    Info
+{% endblock %}
+
+{% block main %}
+    <div class="container-fluid center">
+        <h2>{{ title }}</h2>
+        <h4><em>by</em></h4>
+        {% for author in authors %}
+            <h4>{{ author }}</h4>
+        {% endfor %}
+        <img class="para-spacing border img-fluid" alt="Book cover of {{ title }}" src="{{ cover }}">
+
+        <h5>About <em>{{ title }}</em></h5>
+        <hr>
+        <p>{{ description }}</p>
+        <p>ISBN: {{ isbn }}</p>
+
+        <!-- Adds Book to a specific shelf -->
+        <div class="btn-group dropdown">
+            <form action="/info" method="get">
+                <div class="btn-group dropdown">
+                    <!-- <button type="submit" id="add" name="add" value="{{ isbn }}" class="btn btn-primary">Add to My Books</button> -->
+                    <button type="button" class="btn btn-primary dropdown-toggle"data-bs-toggle="dropdown">
+                        Add to My Books
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu">
+                        <li class="dropdown-header">Shelves</li>
+                        <li><button type="submit" class="dropdown-item" id="add" name="currRead" value="{{ isbn }}" href="/currentlyreading">Currently Reading</button></li>
+                        <li><button type="submit" class="dropdown-item" id="add" name="wantToRead" value="{{ isbn }}" href="/wanttoread">Want to Read</button></li>
+                        <li><button type="submit" class="dropdown-item" id="add" name="alrRead" value="{{ isbn }}" href="/read">Read</button></li>
+                    </ul>
+                </div>
+                <!-- Removes Book from My Books-->
+                <button type="submit" class="btn btn-primary" name="remove" id="remove" value="{{ isbn }}">Remove from My Books</button>
+            </form>
+        </div>
+        <div class="container">
+            <h2 class="review-title mt-4">Book Review</h2>
+                        <!-- Display existing comments -->
+            <div id="comments review-title">
+                <h4 class="review-title mt-4">User Comments:</h4>
+                <ul id="comment-list review-title" >
+                    {% for c in comments %}
+                        <li class="review-title"> <span><strong>{{ c["username"] }}</strong>: {{ c["comment"] }} </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Form to add a new comment -->
+            <form id="commentForm" onsubmit="submitComment(event)">
+                <input type="hidden" name="isbn" value="{{ isbn }}">
+                <h4 class="review-title">Add a Comment:</h4>
+                <textarea name="new_comment" class="form-control" rows="4" placeholder="Write your comment here"></textarea>
+                <button type="submit" class="btn btn-primary mt-2">Submit Comment</button>
+            </form>
+        </div>
+        <script>
+            document.querySelector('#add').onclick = function() {
+                alert("Added to My Books")
+            }
+
+
+        </script>
+
+<script>
+    function submitComment(event) {
+        event.preventDefault();  // Prevent default form submission behavior
+
+        // Get the form data (comment)
+        const comment = document.querySelector('textarea[name="new_comment"]').value;
+        const isbn = '{{ isbn }}';  // Get the ISBN from the template
+
+        // Send the comment data to the server using AJAX
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/submit_comment', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                // Comment submitted successfully, update the comments section
+<!--                const commentList = document.getElementById('comment-list');-->
+<!--                const newCommentItem = document.createElement('li');-->
+<!--                newCommentItem.textContent = comment;-->
+<!--                commentList.appendChild(newCommentItem);-->
+                document.querySelector('textarea[name="new_comment"]').value = '';  // Clear the comment input
+            } else {
+                console.error('Error submitting comment');
+            }
+        };
+        xhr.send(`isbn=${isbn}&new_comment=${encodeURIComponent(comment)}`);
+    }
+</script>
+
+
+{% endblock %}
