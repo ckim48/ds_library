@@ -135,7 +135,7 @@ h5 {
 .sidebar {
   margin: 0;
   padding: 0;
-  width: 200px;
+  width: 230px;
   background-color: rgba(244,241,234,0.5);
   position: fixed;
   height: 90%;
@@ -288,6 +288,10 @@ a:hover {
 .myphoto{
 width:50%;
 }
+.mygraph{
+  background-color: rgba(255, 245, 241   , 1);
+  border-radius: 15px;
+}
 
 .bigfont{
   font-size: 17px;
@@ -297,7 +301,7 @@ width:50%;
 }
 
 .table-data {
-    font-size:15px;
+    font-size:14px;
     color: black;
 }
 .thead-dark{
@@ -332,7 +336,9 @@ width:50%;
           background-color: #993333;
 
         }
-
+        .mytable thead tr th {
+            border-right: 1px solid lightgray; /* Set your desired vertical line color and width */
+        }
         .mytable tbody tr td {
             border-right: 1px solid white; /* Set your desired vertical line color and width */
         }
@@ -340,8 +346,8 @@ width:50%;
   width: 12%;
 }
 #reviewChart {
-  width: 320px !important;
-  height: 320px !important;
+  width:230px !important;
+  height: 230px !important;
 }
 /*#loginChart{
    width: 340px !important;

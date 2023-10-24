@@ -23,6 +23,7 @@
                         <th class="text-start text-center bigfont">Title</th>
                         <th class="text-start text-center bigfont">Author</th>
                         <th class="text-start text-center bigfont">ISBN</th>
+                        <th class="text-start text-center bigfont mywidth">My Rating</th> 
                         <th class="text-start text-center bigfont">Info</th>
                     </tr>
                 </thead>
@@ -36,6 +37,16 @@
                                 <td class="text-start text-center align-middle"><p class="table-data">{{ book['title'] }}</p></td>
                                 <td class="text-start text-center align-middle"><p class="table-data">{{ book['authors'] }}</p></td>
                                 <td class="text-start text-center align-middle"><p class="table-data">{{ book['isbn'] }}</p></td>
+                                <td class="text-start text-center align-middle">
+                                    {% set star_rating = book_ratings[book["isbn"]] | default(0) %}
+                                    <div class="rating" data-book-isbn="{{ book['isbn'] }}">
+                                      {% for i in range(1, 6) %}
+                                        <span class="star" data-rating="{{ i }}">
+                                          <i class="fa-{{ 'solid' if i <= star_rating else 'regular' }} fa-star {{ 'filled' if i <= star_rating else '' }}"></i>
+                                        </span>
+                                      {% endfor %}
+                                    </div>
+                                </td>
                                 <td class="text-center align-middle">
                                     <button type="submit" class="table-data btn btn-outline-primary" action="direct" value="{{ book['isbn'] }}" name="details">Details</button>
                                 </td>
@@ -79,6 +90,44 @@ function updateStarRating(container, rating,bookIsbn) {
         }
     });
 
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/rate_book', true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    const user_id = "{{ session['user_id'] }}";
+    var isbn = bookIsbn
+    var username = user_id
+    xhr.send(JSON.stringify({ isbn,  username, rating }));
+}
+</script>
+
+<script>
+    // JavaScript to handle the rating functionality
+    const ratingContainers = document.querySelectorAll('.rating');
+    var bookIsbn ="";
+    var rating = 5;
+    ratingContainers.forEach(container => {
+        const stars = container.querySelectorAll('.star');
+        stars.forEach(star => {
+            star.addEventListener('click', () => {
+                rating = star.getAttribute('data-rating');
+                bookIsbn = container.getAttribute('data-book-isbn');
+                updateStarRating(container, rating,bookIsbn);
+                alert(`You rated the book with ISBN ${bookIsbn} ${rating} stars.`);
+            });
+        });
+    });
+function updateStarRating(container, rating,bookIsbn) {
+    const stars = container.querySelectorAll('.star');
+    stars.forEach(star => {
+        const starRating = star.getAttribute('data-rating');
+        if (starRating <= rating) {
+            // Change the icon to a filled star
+            star.innerHTML = '<i class="fa-solid fa-star filled"></i>';
+        } else {
+            // Revert to the empty star icon
+            star.innerHTML = '<i class="fa-regular fa-star"></i>';
+        }
+    });
     const xhr = new XMLHttpRequest();
     xhr.open('POST', '/rate_book', true);
     xhr.setRequestHeader('Content-Type', 'application/json');
