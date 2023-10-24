@@ -317,6 +317,33 @@ def currentlyreading():
                                    cover=volumes["cover"], description=volumes["description"], isbn=isbn,
                                    comments=comments)
 
+# Routes for all the shelves:
+@app.route("/oldcurrentlyreading")
+@login_required
+def oldcurrentlyreading():
+    """Display Currently Reading books"""
+
+    # If request via GET, display user's books
+    if request.method == "GET":
+        # Obtain book info
+        myBooks = db.execute(
+            "SELECT DISTINCT library.isbn, title, authors, cover FROM library WHERE user_id = ? AND isbn IN (SELECT myBooks.isbn FROM myBooks WHERE shelf = ?)",
+            session["user_id"], "currentlyReading")
+
+        return render_template("currentlyreading_old.html", books=myBooks)
+
+    else:
+        # If request via POST (user clicked on details button for a specific book)
+        if request.form.get("details"):
+            # Lookup book info
+            isbn = request.form.get("details")
+            volumes = lookup(isbn)
+            comments = db.execute("SELECT user_id, comment FROM comments WHERE isbn = ?", isbn)
+
+            # Display book info
+            return render_template("info_old.html", title=volumes["title"], authors=volumes["authors"],
+                                   cover=volumes["cover"], description=volumes["description"], isbn=isbn,
+                                   comments=comments)
 
 @app.route("/wanttoread")
 @login_required
@@ -345,6 +372,34 @@ def wanttoread():
                                    cover=volumes["cover"], description=volumes["description"], isbn=isbn,
                                    comments=comments)
 
+
+
+@app.route("/oldwanttoread")
+@login_required
+def oldwanttoread():
+    """Display Want To Read books"""
+
+    # If request via GET, display user's books
+    if request.method == "GET":
+        # Obtain book info
+        myBooks = db.execute(
+            "SELECT DISTINCT library.isbn, title, authors, cover FROM library WHERE user_id = ? AND isbn IN (SELECT myBooks.isbn FROM myBooks WHERE shelf = ?)",
+            session["user_id"], "wantToRead")
+
+        return render_template("wanttoread_old.html", books=myBooks)
+
+    else:
+        # If request via POST (user clicked on details button for a specific book)
+        if request.form.get("details"):
+            # Lookup book info
+            isbn = request.form.get("details")
+            volumes = lookup(isbn)
+            comments = db.execute("SELECT user_id, comment FROM comments WHERE isbn = ?", isbn)
+
+            # Display book info
+            return render_template("info_old.html", title=volumes["title"], authors=volumes["authors"],
+                                   cover=volumes["cover"], description=volumes["description"], isbn=isbn,
+                                   comments=comments)
 
 @app.route("/read")
 @login_required
@@ -383,7 +438,42 @@ def read():
                                    cover=volumes["cover"], description=volumes["description"], isbn=isbn,
                                    comment=comments)
 
+@app.route("/oldread")
+@login_required
+def oldread():
+    """Display Read books"""
 
+    # If request via GET, display user's books
+    if request.method == "GET":
+        book_ratings = {}
+        # Obtain book info
+        myBooks = db.execute(
+            "SELECT DISTINCT library.isbn, title, authors, cover FROM library WHERE isbn IN (SELECT myBooks.isbn FROM myBooks WHERE user_id = ? AND shelf = ?)",
+            session["user_id"], "read")
+        print(myBooks)
+        for book in myBooks:
+            isbn = book['isbn']
+            rating = db.execute("SELECT rating FROM rating WHERE isbn = ? AND username = ?", isbn, session["user_id"])
+            if rating:
+                if rating:
+                    book_ratings[isbn] = int(rating[0]["rating"])
+                else:
+                    # If no rating exists, set it to 0
+                    book_ratings[isbn] = 0
+        return render_template("read_old.html", books=myBooks, book_ratings=book_ratings)
+
+    else:
+        # If request via POST (user clicked on details button for a specific book)
+        if request.form.get("details"):
+            # Lookup book info
+            isbn = request.form.get("details")
+            volumes = lookup(isbn)
+            comments = db.execute("SELECT user_id, comment FROM comments WHERE isbn = ?", isbn)
+
+            # Display book info
+            return render_template("info_old.html", title=volumes["title"], authors=volumes["authors"],
+                                   cover=volumes["cover"], description=volumes["description"], isbn=isbn,
+                                   comment=comments)
 @app.route("/library")
 def library():
     """Display library page"""
@@ -445,6 +535,66 @@ def library():
             return render_template("info.html", title=volumes["title"], authors=volumes["authors"],
                                    cover=volumes["cover"], description=volumes["description"], isbn=isbn)
 
+@app.route("/oldlibrary")
+def oldlibrary():
+    """Display library page"""
+    # Log-in not required for those only interested in borrowing books
+
+    # If request via GET, display library
+    if request.method == "GET":
+        # Create a dictionary to store book ratings by ISBN
+        book_ratings = {}
+        recommend_isbns = get_recommendations()
+        recommend_books = list()
+        emails = list()
+
+        for isbn in recommend_isbns:
+            book = db.execute("SELECT DISTINCT isbn, title, authors, cover FROM library WHERE isbn=?", isbn)
+            email = db.execute("SELECT user_email FROM library WHERE isbn=?", isbn)
+            rating = db.execute("SELECT rating FROM rating WHERE isbn = ? AND username = ?", isbn, session["user_id"])
+            if rating:
+                book_ratings[isbn] = int(rating[0]["rating"])
+            else:
+                # If no rating exists, set it to 0
+                book_ratings[isbn] = 0
+
+            recommend_books.append(book[0])
+            emails.append(email[0])
+
+        # Create a dictionary to store book ratings by ISBN
+        book_ratings2 = {}
+        book_sentiments = {}
+        recommend_sentiments = sentiment_all_books()
+        recommend_books_sentiments = list()
+        emails2 = list()
+
+        for isbn in sorted(recommend_sentiments, key=lambda x: recommend_sentiments[x], reverse=True):
+            book = db.execute("SELECT DISTINCT isbn, title, authors, cover FROM library WHERE isbn=?", isbn)
+            email2 = db.execute("SELECT user_email FROM library WHERE isbn=?", isbn)
+            rating = db.execute("SELECT rating FROM rating WHERE isbn = ? AND username = ?", isbn, session["user_id"])
+            book[0]["sentiment"] = recommend_sentiments[isbn]
+            if rating:
+                book_ratings2[isbn] = int(rating[0]["rating"])
+            else:
+                # If no rating exists, set it to 0
+                book_ratings2[isbn] = 0
+
+            recommend_books_sentiments.append(book[0])
+            emails2.append(email2[0])
+        return render_template("library_old.html", books=recommend_books, emails=emails, book_ratings=book_ratings,
+                               books2=recommend_books_sentiments, emails2=emails2, book_sentiments=book_sentiments)
+
+    else:
+        # If request via POST (user clicked on details button for a specific book)
+        if request.form.get("details"):
+            # Lookup book info
+            isbn = request.form.get("details")
+            volumes = lookup(isbn)
+            comments = db.execute("SELECT user_id, comment FROM comments WHERE isbn = ?", isbn)
+
+            # If successful, display book info
+            return render_template("info_old.html", title=volumes["title"], authors=volumes["authors"],
+                                   cover=volumes["cover"], description=volumes["description"], isbn=isbn)
 
 @app.route('/library')
 @login_required
@@ -558,7 +708,7 @@ def get_sentiment(isbn):
     total_sentiment = 0
     total_comments = len(comments)
     if not comments:
-        return -1000  # when no comments
+        return 0.0  # when no comments
     for comment in comments:
         sentiment = analyzer.polarity_scores(comment['comment'])
         total_sentiment += sentiment["compound"]

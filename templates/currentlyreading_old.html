@@ -1,14 +1,14 @@
 {% extends "layout_old.html" %}
 
 {% block title %}
-    Home
+    Currently Reading
 {% endblock %}
 
 {% block main %}
     <!-- The sidebar -->
     <div class="sidebar">
-        <a class="active" href="/"><h3><strong>My Books</strong></h3></a>
-        <a href="/oldcurrentlyreading">Currently Reading</a>
+        <a href="/old"><h3><strong>My Books</strong></h3></a>
+        <a class="active" href="/currentlyreading">Currently Reading</a>
         <a href="/oldwanttoread">Want To Read</a>
         <a href="/oldread">Read</a>
     </div>
@@ -16,8 +16,6 @@
     <!-- The content -->
     <main class="container">
         <div class="content">
-            <h3>Hello, {{ name }}</h3>
-            <!-- Added a fun aspect of highlighting the table's cells when hovering over them! -->
             <table class="text-center table table-striped table-hover">
                 <thead>
                     <tr>

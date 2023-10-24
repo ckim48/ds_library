@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+{% extends "layout_old.html" %}
 
 {% block title %}
     Read
@@ -8,37 +8,35 @@
     <!-- The sidebar -->
     <div class="sidebar">
         <a href="/"><h3><strong>My Books</strong></h3></a>
-        <a href="/currentlyreading">Currently Reading</a>
-        <a href="/wanttoread">Want To Read</a>
+        <a href="/oldcurrentlyreading">Currently Reading</a>
+        <a href="/oldwanttoread">Want To Read</a>
         <a class="active" href="/read">Read</a>
     </div>
 
     <!-- The content -->
-    <main>
-        <div class="container">
+    <main class="container">
         <div class="content">
-            <table class="table mytable">
-                <thead class="thead-dark">
+            <table class="text-center table table-striped table-hover">
+                <thead>
                     <tr>
-                        <th class="text-start text-center bigfont">Cover</th>
-                        <th class="text-start text-center bigfont">Title</th>
-                        <th class="text-start text-center bigfont">Author</th>
-                        <th class="text-start text-center bigfont">ISBN</th>
-                        <th class="text-start text-center bigfont mywidth">My Rating</th> 
-                        <th class="text-start text-center bigfont">Info</th>
+                        <th class="text-start">Cover</th>
+                        <th class="text-start">Title</th>
+                        <th class="text-start">Author</th>
+                        <th class="text-start">isbn</th>
+                        <th class="text-start">My Rating</th>  <!-- New column for rating -->
                     </tr>
                 </thead>
-              <tbody>
-                                        {% for book in books %}
+                <tbody>
+                    {% for book in books %}
                         <tr>
                             <form action="/" method="post">
-                                <td class="text-start text-center align-middle">
+                                <td class="text-start">
                                     <img class="cover" src="{{ book['cover'] }}" alt="Example cover">
                                 </td>
-                                <td class="text-start text-center align-middle"><p class="table-data">{{ book['title'] }}</p></td>
-                                <td class="text-start text-center align-middle"><p class="table-data">{{ book['authors'] }}</p></td>
-                                <td class="text-start text-center align-middle"><p class="table-data">{{ book['isbn'] }}</p></td>
-                                <td class="text-start text-center align-middle">
+                                <td class="text-start"><p class="table-data">{{ book['title'] }}</p></td>
+                                <td class="text-start"><p class="table-data">{{ book['authors'] }}</p></td>
+                                <td class="text-start"><p class="table-data">{{ book['isbn'] }}</p></td>
+                                <td>
                                     {% set star_rating = book_ratings[book["isbn"]] | default(0) %}
                                     <div class="rating" data-book-isbn="{{ book['isbn'] }}">
                                       {% for i in range(1, 6) %}
@@ -48,16 +46,15 @@
                                       {% endfor %}
                                     </div>
                                 </td>
-                                <td class="text-center align-middle">
+                                <td>
                                     <button type="submit" class="table-data btn btn-outline-primary" action="direct" value="{{ book['isbn'] }}" name="details">Details</button>
                                 </td>
                             </form>
                         </tr>
                     {% endfor %}
-              </tbody>
+                </tbody>
             </table>
         </div>
-    </div>
     </main>
 
 <script>
@@ -92,44 +89,6 @@ function updateStarRating(container, rating,bookIsbn) {
         }
     });
 
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', '/rate_book', true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    const user_id = "{{ session['user_id'] }}";
-    var isbn = bookIsbn
-    var username = user_id
-    xhr.send(JSON.stringify({ isbn,  username, rating }));
-}
-</script>
-
-<script>
-    // JavaScript to handle the rating functionality
-    const ratingContainers = document.querySelectorAll('.rating');
-    var bookIsbn ="";
-    var rating = 5;
-    ratingContainers.forEach(container => {
-        const stars = container.querySelectorAll('.star');
-        stars.forEach(star => {
-            star.addEventListener('click', () => {
-                rating = star.getAttribute('data-rating');
-                bookIsbn = container.getAttribute('data-book-isbn');
-                updateStarRating(container, rating,bookIsbn);
-                alert(`You rated the book with ISBN ${bookIsbn} ${rating} stars.`);
-            });
-        });
-    });
-function updateStarRating(container, rating,bookIsbn) {
-    const stars = container.querySelectorAll('.star');
-    stars.forEach(star => {
-        const starRating = star.getAttribute('data-rating');
-        if (starRating <= rating) {
-            // Change the icon to a filled star
-            star.innerHTML = '<i class="fa-solid fa-star filled"></i>';
-        } else {
-            // Revert to the empty star icon
-            star.innerHTML = '<i class="fa-regular fa-star"></i>';
-        }
-    });
     const xhr = new XMLHttpRequest();
     xhr.open('POST', '/rate_book', true);
     xhr.setRequestHeader('Content-Type', 'application/json');

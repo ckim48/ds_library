@@ -7,7 +7,7 @@
 {% block main %}
     <main >
         <div class="container">
-        <h1>What You Might Like <span data-toggle="tooltip" data-placement="top" title="The books are recommended by a contents-based recommender system with the users' ratings">
+        <h1 class="redcolor">What You Might Like <span class="blackfont" data-toggle="tooltip" data-placement="top" title="The books are recommended by a contents-based recommender system with the users' ratings">
   <i class="far fa-question-circle"></i>
 </span></h1>
         <table class="text-center table  mytable mt-5">
@@ -54,7 +54,7 @@
 
 
                 <div class="container">
-        <h1 class="mt-5 mb-4">Recommendations By Sentiment Analysis<span data-toggle="tooltip" data-placement="top" title="The books are recommended by a sentiment score which is achieved by analyzing the users' reviews ">
+        <h1 class="mt-5 mb-4 redcolor">Recommendations By Sentiment Analysis<span class="blackfont" data-toggle="tooltip" data-placement="top" title="The books are recommended by a sentiment score which is achieved by analyzing the users' reviews ">
   <i class="far fa-question-circle"></i>
 </span></h1>
         <table class="text-center table mytable mt-5">
@@ -79,13 +79,10 @@
                             </td>
                             <td class="text-start text-center align-middle"><p class="table-data">{{ book['title'] }}</p></td>
                             <td class="text-start text-center align-middle"><p class="table-data">{{ book['authors'] }}</p></td>
-                            {% if  book['sentiment']  == -1000 %}
-                                <td class="text-start text-center align-middle"><p class="table-data">0%</p></td>
 
-                            {%else%}
                                  <td class="text-start text-center align-middle"><p class="table-data">{{ book['sentiment'] }}%</p></td>
 
-                            {% endif %}
+                         
 
                             <td class="text-start text-center align-middle">
                                 <button type="submit" class="table-data btn btn-outline-primary" action="direct" value="{{ book['isbn'] }}" name="details">Details</button>
