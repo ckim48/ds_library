@@ -4,7 +4,9 @@ nav .navbar-brand
     font-size: xx-large;
     font-family: 'Poppins', sans-serif, "Garamond", "Georgia", "Times New Roman", serif;
 }
-
+.text-justify{
+  text-align: justify;
+}
 /* Colors for brand */
 nav .navbar-brand .blue
 {
@@ -370,6 +372,9 @@ section {
 
 .section-bg {
   background-color: #FEF5F0;
+}
+.about p{
+  font-size: 15px;
 }
 .about{
   color:#555;
