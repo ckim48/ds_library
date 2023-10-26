@@ -20,34 +20,40 @@
             <!-- <h3 class="mb-4">Hello, {{ name }}</h3> -->
             <!-- Added a fun aspect of highlighting the table's cells when hovering over them! -->
 
-            <table class="table mytable">
-                <thead class="thead-dark">
-                    <tr>
-                        <th class="text-start text-center bigfont">Cover</th>
-                        <th class="text-start text-center bigfont">Title</th>
-                        <th class="text-start text-center bigfont">Author</th>
-                        <th class="text-start text-center bigfont">ISBN</th>
-                        <th class="text-start text-center bigfont">Info</th>
-                    </tr>
-                </thead>
-              <tbody>
-                                        {% for book in books %}
-                        <tr>
-                            <form action="/" method="post">
-                                <td class="text-start text-center align-middle">
-                                    <img class="cover" src="{{ book['cover'] }}" alt="Example cover">
-                                </td>
-                                <td class="text-start text-center align-middle"><p class="table-data">{{ book['title'] }}</p></td>
-                                <td class="text-start text-center align-middle"><p class="table-data">{{ book['authors'] }}</p></td>
-                                <td class="text-start text-center align-middle"><p class="table-data">{{ book['isbn'] }}</p></td>
-                                <td class="text-center align-middle">
-                                    <button type="submit" class="table-data btn btn-outline-primary" action="direct" value="{{ book['isbn'] }}" name="details">Details</button>
-                                </td>
-                            </form>
-                        </tr>
-                    {% endfor %}
-              </tbody>
-            </table>
+<table class="table mytable">
+    <thead class="thead-dark">
+        <tr>
+            <th class="text-start text-center bigfont">Cover</th>
+            <th class="text-start text-center bigfont">Title</th>
+            <th class="text-start text-center bigfont">Author</th>
+            <th class="text-start text-center bigfont">ISBN</th>
+            <th class="text-start text-center bigfont">Info</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if books %}
+            {% for book in books %}
+                <tr>
+                    <form action="/" method="post">
+                        <td class="text-start text-center align-middle">
+                            <img class="cover" src="{{ book['cover'] }}" alt="Example cover">
+                        </td>
+                        <td class="text-start text-center align-middle"><p class="table-data">{{ book['title'] }}</p></td>
+                        <td class="text-start text-center align-middle"><p class="table-data">{{ book['authors'] }}</p></td>
+                        <td class="text-start text-center align-middle"><p class="table-data">{{ book['isbn'] }}</p></td>
+                        <td class="text-center align-middle">
+                            <button type="submit" class="table-data btn btn-outline-primary" action="direct" value="{{ book['isbn'] }}" name="details">Details</button>
+                        </td>
+                    </form>
+                </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="5" class="text-center">No items</td>
+            </tr>
+        {% endif %}
+    </tbody>
+</table>
 
         </div>
     </div>

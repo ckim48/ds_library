@@ -28,6 +28,7 @@
                     </tr>
                 </thead>
               <tbody>
+              {% if books %}
                                         {% for book in books %}
                         <tr>
                             <form action="/" method="post">
@@ -43,6 +44,11 @@
                             </form>
                         </tr>
                     {% endfor %}
+                      {% else %}
+            <tr>
+                <td colspan="5" class="text-center">No items</td>
+            </tr>
+        {% endif %}
               </tbody>
             </table>
         </div>
