@@ -189,10 +189,7 @@ const reviewChart = new Chart(ctx3, {
 });
 
 
-const loginData = {
-  labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-  data: [10, 12, 17, 22, 26, 30, 20, 25, 10, 25, 17, 35],
-};
+const loginData = {{login_data|tojson|safe}};
 
 const ctx4 = document.getElementById("loginChart").getContext("2d");
 

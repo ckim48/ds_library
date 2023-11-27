@@ -24,8 +24,8 @@ Session(app)
 # Configure CS50 Library to use SQLite database
 db = SQL("sqlite:///lionbooks.db")
 
-sentiment_nums = {}
-
+sentiment_nums = {} # sentiment_nums = {"positive": 13, "negative:10,"netural":}
+login_nums = {}
 # with open('mock_data.csv', 'r') as file:
 #     csv_reader = csv.reader(file)
 #     next(csv_reader)  # Skip header row if needed
@@ -244,6 +244,7 @@ def info(isbn="", shelf=None):
     elif request.args.get("alrRead"):
         isbn = request.args.get("alrRead")
         shelf = "read"
+        # year month day and time even second
         current_year = int(datetime.now().strftime("%y")) + 2000
         current_month = datetime.now().strftime("%m")
 
@@ -713,7 +714,8 @@ def about():
 
 @app.route('/stats', methods=['GET'])
 def stats():
-    return render_template('stats.html',sentiment_nums=sentiment_nums)
+    login_data = get_login_data()
+    return render_template('stats.html',sentiment_nums=sentiment_nums,login_data=login_data)
 
 
 def get_sentiment(isbn):
@@ -733,7 +735,7 @@ def get_sentiment(isbn):
 
 def sentiment_all_books():
     book_list = db.execute("SELECT DISTINCT isbn FROM library")
-    sentiments = {}
+    sentiments = {} # isbn with the sentiment score
 
     for book in book_list:
         sentiment = get_sentiment(book["isbn"])
@@ -776,7 +778,7 @@ def get_read_books_by_month():
 @app.route('/get_read_books_by_year', methods=['POST'])
 def get_read_books_by_year():
     user_id = session["user_id"]
-    counts = {}  # A dictionary to store the counts for each month
+    counts = {}  # A dictionary to store the counts for each year
     current_year = int(datetime.now().strftime("%y")) + 2000
     for year in range(current_year - 4, current_year + 1):
         query = "SELECT COUNT(*) as count FROM read_books WHERE user_id = ? AND year = ?"
@@ -793,8 +795,25 @@ def get_read_books_by_year():
     books_read = [counts[year] for year in years]
 
     return jsonify({"years": years, "booksRead": books_read})
+@app.route('/get_login_data', methods=['POST'])
+def get_login_data():
+    user_id = session["user_id"]
+    counts = {}  # A dictionary to store the counts for each month
 
+    for month in range(1, 13):
+        query = "SELECT COUNT(*) as count FROM Login WHERE user_id = ? AND month = ?"
+        result = db.execute(query, user_id, month)
+        if result:
+            count = result[0]["count"]
+        else:
+            count = 0
+        counts[month] = count
 
+    # Convert the counts dictionary to lists for JSON output
+    months = list(counts.keys())
+    logins = [counts[month] for month in months]
+
+    return {"labels": months, "data": logins}
 if __name__ == '__main__':
     app.run(debug=True)
 
