@@ -127,7 +127,8 @@ def login():
 
         # Remember which user has logged in
         session["user_id"] = rows[0]["id"]
-
+        db.execute('INSERT INTO Login (user_id, number, month, year) VALUES (?, ?, ?, ?)',
+                   session["user_id"], 1,datetime.now().strftime("%m") , int(datetime.now().strftime("%y")) + 2000)
         # Redirect user to home page
         return redirect("/")
 
