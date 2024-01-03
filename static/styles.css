@@ -457,3 +457,16 @@ section {
 .redcolor{
   color: #993333;
 }
+
+.login-intro{
+padding:40px;
+border: 1px solid darkgray;
+border-radius: 12px;
+}
+.loginimg{
+width: 88%;
+border: 1px solid darkgray;
+}
+.login-intro p{
+font-size:16px;
+}
