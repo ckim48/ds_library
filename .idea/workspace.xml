@@ -5,12 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b7d4a537-f2e8-4ecb-a78b-74f8a22bd869" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/deployment.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/ds_library.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/ds_library.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/flask_session/a2bf43f4a7146ab2de52019e4c4f20b2" beforeDir="false" afterPath="$PROJECT_DIR$/flask_session/a2bf43f4a7146ab2de52019e4c4f20b2" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/static/styles.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/login.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
